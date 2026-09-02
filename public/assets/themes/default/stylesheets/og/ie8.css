@@ -1,0 +1,49 @@
+@CHARSET "ISO-8859-1";
+
+.widget {
+	/* Shadow for ie7 */
+	#zoom: 1;
+	#filter: progid:DXImageTransform.Microsoft.Shadow(color='#CCCCCC', Direction=135, Strength=6);
+}
+
+.widget {
+	/* Shadow for ie7 */
+	#zoom: 1;
+	#filter: progid:DXImageTransform.Microsoft.Shadow(color='#CCCCCC', Direction=135, Strength=6);
+}
+
+.widget-body {
+	border-left: 1px solid #FAFAFA;
+}
+
+
+div.user-box-actions {
+	width: 252px;
+	float: left ; 
+}
+
+input[type=checkbox] {
+	padding: 0;
+	border: 0px none;
+}
+
+button.add-first-btn {
+    min-width: 200px !important;
+}
+
+
+div.login-body div.input input, div.login-body div.form-container input[type!=checkbox]  {
+	padding-top: 7px;
+	height: 25px;
+	border: 2px solid #ddd;
+}
+div.login-body div.input select {
+	height: 30px;
+	margin-top: 5px;
+}
+div.login-body div.form-container button[type=submit] {
+	border: 2px solid #69a239;
+}
+div.login-body div.form-container button[type=submit]:hover {
+	border: 2px solid #3D6A27;
+}

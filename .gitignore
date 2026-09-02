@@ -1,0 +1,29 @@
+# Dane produkcyjne / dumpy bazy - nigdy nie commitować
+*.sql
+*.sql.gz
+*.sql.zip
+
+# Załączniki użytkowników (GB danych, poza gitem)
+/upload/
+
+# Cache aplikacji (w tym generowany autoloader i log.php)
+/cache/*
+!/cache/.htaccess
+!/cache/dummy.txt
+
+# Pliki tymczasowe
+/tmp/*
+!/tmp/.htaccess
+
+# Logi
+*.log
+cache/log.time
+
+# Konfiguracja lokalna z danymi wrażliwymi (hasła do DB itp.)
+/config/config.php
+
+# Systemowe / edytorskie
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

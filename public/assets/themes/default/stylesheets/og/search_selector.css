@@ -1,0 +1,88 @@
+.search-selector .item-template{
+	display: none!important;
+}
+
+.search-selector .search-input{
+	height: 21px;	
+	border-radius: 4px;	
+	padding: 0 20px 0 0!important;
+	text-overflow: ellipsis;
+	width: 100%;
+}
+
+.search-selector .search-input-div{
+	margin-right: 20px;
+	position: relative;
+}
+
+.ico-search-m{
+	background: url("../../images/16x16/search_m.png") no-repeat scroll right center white; 
+	height: 16px;
+	width: 16px;
+	position: absolute;	
+	right: 0;
+	margin-top: 4px;
+	margin-right: -20px;
+	cursor: pointer;	
+}
+
+.search-selector-more{
+	background: #E8E5E3;
+	color: #003562;
+	text-align: center;
+}
+
+.ui-autocomplete{
+	max-height: 300px!important;
+	overflow-y: scroll;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+    /* add padding to account for vertical scrollbar */
+    padding: 20px;
+}
+
+/* Templates css*/
+
+/*search-selector-item-template-1*/
+.search-selector-result .searchResultImg{
+	background-image: url("../../images/48x48/contact.png");
+	height: 48px;
+    width: 48px;
+}
+
+.search-selector-result{
+	display: inline-block;
+}
+
+.search-selector-result .search-result-ico{
+	min-width: 16px; 
+	min-height: 16px;
+}
+
+.search-result-row-small{
+	min-height: 20px!important;
+}
+
+.search-result-row-medium{
+	min-height: 36px!important;
+}
+
+.searchResultLeft{
+	float: left;
+	clear: left;	
+	min-height: 25px;	
+}
+
+.searchResultInfo{
+	float: left;
+	margin-left: 2px;
+	text-overflow: ellipsis;
+}
+/*END search-selector-item-template-1*/
+ 
+ 
+
+
+
+
+
