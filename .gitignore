@@ -2,6 +2,7 @@
 *.sql
 *.sql.gz
 *.sql.zip
+!/config/PRODUCTION_DB_SETUP.sql
 
 # Załączniki użytkowników (GB danych, poza gitem)
 /upload/
@@ -21,6 +22,11 @@ cache/log.time
 
 # Konfiguracja lokalna z danymi wrażliwymi (hasła do DB itp.)
 /config/config.php
+
+# Pliki związane z asystentami AI (kontekst roboczy, nie część projektu)
+/CLAUDE.md
+/AGENTS.md
+.claude/
 
 # Systemowe / edytorskie
 .DS_Store

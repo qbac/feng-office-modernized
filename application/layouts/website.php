@@ -323,7 +323,10 @@ $show_owner_company_name_header = config_option("show_owner_company_name_header"
 		<?php } // if ?>
 	</div>
 	<?php Hook::fire('render_page_footer', null, $ret) ?>
-	<div id="productSignature"><?php echo product_signature() ?></div>
+	<div id="productSignature">
+		<?php echo product_signature() ?>
+		&nbsp;–&nbsp;<a href="<?php echo defined('SOURCE_CODE_URL') ? SOURCE_CODE_URL : 'https://github.com/qbac/feng-office-modernized' ?>" target="_blank" rel="noopener">kod źródłowy (AGPLv3)</a>
+	</div>
 </div>
 <!-- /footer -->
 

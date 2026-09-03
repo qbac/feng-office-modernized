@@ -1,0 +1,7 @@
+.git
+upload/
+*.sql
+*.sql.gz
+*.sql.zip
+cache/*
+tmp/*

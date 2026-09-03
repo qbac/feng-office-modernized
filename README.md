@@ -1,11 +1,19 @@
 # Feng Office (fo23) — środowisko lokalne (Laragon)
 
+> Nieoficjalny fork/modernizacja [Feng Office](http://fengoffice.com/) `2.7.1.6` — projekt i jego
+> zespół nie są w żaden sposób powiązani z tym repozytorium. Na licencji **AGPLv3** (patrz
+> `license.txt`) — kod źródłowy tej wersji, wraz ze wszystkimi modyfikacjami, jest dostępny
+> zgodnie z warunkami tej licencji.
+
 CRM/kolaboracja oparta o Feng Office `2.7.1.6`. Historycznie produkcja działa na
 PHP 5.5.9 + MySQL 5.5.62. To repo dokumentuje migrację na
-PHP 8.4 + MySQL 8.4 i pracę lokalną w Laragonie.
+PHP 8.4 + MySQL 8.4 i pracę lokalną w Laragonie. Aplikacja działa wyłącznie w wewnętrznej
+sieci firmowej (dostęp z zewnątrz tylko przez VPN) — mimo to podlega klauzuli sieciowej AGPLv3
+(dotyczy każdego użytkownika łączącego się przez sieć, nie tylko dostępu publicznego), stąd
+publikacja kodu źródłowego.
 
 Szczegóły architektury, status migracji i lista niekompatybilności PHP 8.4 do naprawienia:
-zobacz **`CLAUDE.md`**.
+zobacz `CHANGELOG.md`.
 
 ## Wymagania
 
@@ -56,10 +64,10 @@ Po drodze naprawiono sporo realnych bugów w kodzie (nie tylko kosmetycznych) �
 parametrów, zarezerwowaną nazwę klasy `Object`, `continue` poza pętlą, twarde ścieżki produkcyjne
 w cache autoloadera, a przede wszystkim **cały wzorzec "non-static method called statically"**,
 który w PHP 8.0+ jest fatalnym błędem (nie deprecation jak w 7.x) i cicho zabijał request bez
-żadnego śladu w logach. Pełna lista w `CLAUDE.md` i `CHANGELOG.md` (wpis `2026-09-03`).
+żadnego śladu w logach. Pełna lista w `CHANGELOG.md` (wpis `2026-09-03`).
 
 Znany drobny problem: `http://fo.local/` (bez `index.php`) serwuje pusty statyczny plik zamiast
-przechodzić przez PHP — patrz `CLAUDE.md`.
+przechodzić przez PHP.
 
 Żeby przełączyć wersję PHP używaną przez Laragon dla Apache przez CLI/dev-server: Laragon → prawy
 klik na "PHP" w menu → wybór wersji. Apache (przez `mod_fcgid`) ma wersję PHP 8.4.12 wpisaną na
@@ -76,6 +84,6 @@ Patrz `.gitignore`.
 
 ## Plany
 
-- Migracja pełnego stosu na PHP 8.4 (lista blockerów w `CLAUDE.md`)
+- Migracja pełnego stosu na PHP 8.4 (lista blockerów w `CHANGELOG.md`)
 - REST API (bazując na istniejących zalążkach w `public/API/` i `public/webservices/`, albo od zera)
 - Serwer MCP dla integracji z AI

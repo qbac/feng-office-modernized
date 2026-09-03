@@ -1,0 +1,30 @@
+<?php
+  // Szablon config.php dla wdrożenia w Dockerze na produkcji.
+  // Skopiować na serwerze jako config/config.php (plik jest w .gitignore, nigdy nie commitować
+  // z prawdziwym hasłem) i uzupełnić DB_PASS danymi utworzonymi wg config/PRODUCTION_DB_SETUP.sql.
+  //
+  // DB_HOST = 'database' -> nazwa usługi kontenera MySQL w sieci `shared_mysql_net`
+  // (patrz docker-compose.yml). To NIE jest nowy kontener, tylko już istniejący, współdzielony
+  // z innym projektem na tym samym serwerze.
+
+  define('DB_ADAPTER', 'pdo_mysql');
+  define('DB_HOST', 'database');
+  define('DB_USER', 'fo23');
+  define('DB_PASS', 'ZMIEN_TO_HASLO');
+  define('DB_NAME', 'fo23');
+  define('DB_PERSIST', false);
+  define('TABLE_PREFIX', 'fo_');
+  define('DB_ENGINE', 'InnoDB');
+  define('ROOT_URL', 'https://crm.example.com'); // PODMIEŃ na docelową domenę
+  define('DEFAULT_LOCALIZATION', 'en_us');
+  define('COOKIE_PATH', '/');
+  define('DEBUG', false);
+  define('DB_CHARSET', 'utf8');
+
+  // Link w stopce aplikacji (wymóg AGPLv3 — kod źródłowy dostępny użytkownikom usługi).
+  // Domyślny fallback w application/layouts/website.php wskazuje na to samo repo, ale nadpisz tu,
+  // jeśli repo zmieni adres/organizację.
+  define('SOURCE_CODE_URL', 'https://github.com/qbac/feng-office-modernized');
+
+  return true;
+?>

@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    networks:
+      - internal          # app <-> web, izolowana od innych projektów na tym samym serwerze —
+                           # jeśli inny projekt na tym serwerze też ma usługę o nazwie "app",
+                           # nie może być na tej samej sieci co "web" (patrz komentarz przy web)
+      - shared_mysql_net   # app -> istniejący, współdzielony kontener MySQL (patrz networks niżej)
+
+  web:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8084:80"   # przykładowy port hosta — sprawdź `docker ps` na docelowym serwerze i wybierz
+                    # faktycznie wolny
+    volumes:
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - internal   # tylko web <-> app; NIE shared_mysql_net — żeby fastcgi_pass app:9000
+                   # nie mogło się omyłkowo rozwiązać na kontener "app" innego projektu, jeśli
+                   # ten inny projekt też jest podłączony do współdzielonej sieci bazy danych
+
+networks:
+  internal:
+    driver: bridge
+  shared_mysql_net:
+    external: true   # PODMIEŃ na faktyczną nazwę sieci Dockera utworzonej przez docker-compose
+                      # innego, już działającego projektu, który hostuje współdzielony kontener
+                      # MySQL (Docker Compose nadaje sieciom nazwę `<katalog_projektu>_<nazwa>`)

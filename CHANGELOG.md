@@ -7,6 +7,170 @@ Najnowsze zmiany na górze.
 
 ## [Nieopublikowane]
 
+## 2026-09-03 (część 6): zgodność z AGPLv3 przed publikacją na GitHubie
+
+Feng Office jest na licencji AGPLv3 (`license.txt`) — jej klauzula sieciowa obowiązuje niezależnie
+od tego, że konkretne wdrożenie działa tylko w sieci wewnętrznej (dostęp z zewnątrz wyłącznie przez
+VPN): każdy użytkownik łączący się przez sieć musi mieć możliwość dotarcia do kodu źródłowego
+zmodyfikowanej wersji, nie tylko użytkownicy internetu publicznego.
+
+### Dodane
+- `README.md` — notatka na górze: nieoficjalny fork, brak powiązania z Feng Office, licencja
+  AGPLv3.
+- **Link "Kod źródłowy (AGPLv3)" w stopce aplikacji** (`application/layouts/website.php`, obok
+  istniejącego `product_signature()`) — wskazuje na `SOURCE_CODE_URL` (nowa stała configu,
+  ustawiana per-wdrożenie w `config/config.php`). Spełnia literalnie wymóg AGPLv3 §13 (prominent
+  notice + sposób dotarcia do Corresponding Source) niezależnie od tego, czy operator wdrożenia
+  poinformował użytkowników o lokalizacji repo inną drogą.
+
+## 2026-09-03 (część 5): przygotowanie deploymentu Docker pod produkcję
+
+Cel: wdrożenie w środowisku Docker obok innych, już działających projektów na tym samym serwerze,
+za nginxem/reverse proxy. **Świadoma decyzja: bez własnego kontenera MySQL** — kontener `app`
+dołącza do już istniejącej, współdzielonej sieci Dockera (utworzonej przez inny projekt w tej
+samej infrastrukturze) i łączy się z jego kontenerem MySQL, zamiast stawiać kolejny serwer
+bazodanowy. Wymaga dostosowania nazwy sieci/kontenera do konkretnego środowiska docelowego —
+patrz komentarze w `docker-compose.yml`.
+
+### Dodane
+- `Dockerfile` — `php:8.4-fpm` + rozszerzenia realnie używane przez kod: `gd` (fpdf/simplegd),
+  `curl` (PEAR/Zend HTTP), `zip` (upload/eksport plików), `mbstring`, `pdo_mysql`, `xml`, `opcache`
+  (zweryfikowane grepem po `application/`/`library/`, nie zgadywane).
+- `docker-compose.yml` — usługi `app` (PHP-FPM) i `web` (nginx, port hosta **8084** jako przykład —
+  zweryfikuj `docker ps` na docelowym serwerze i wybierz faktycznie wolny port). `web` widzi tylko
+  izolowaną sieć `internal`, nie sieć współdzieloną z bazą — żeby uniknąć sytuacji, w której dwa
+  różne projekty na tym samym serwerze mają usługę o tej samej nazwie (`app`) na wspólnej sieci
+  i `fastcgi_pass app:9000` omyłkowo rozwiązuje się na kontener innego projektu. Brak usługi
+  `database` — zamiast tego zewnętrzna sieć (`external: true`) wskazująca na już istniejący
+  kontener bazy.
+- `nginx.conf` — document root = katalog główny projektu (nie `public/`), bo Feng Office wywołuje
+  `index.php` bezpośrednio z roota (routing przez query string), a `public/` to tylko
+  assety/API/webservices. Zablokowany bezpośredni dostęp do `config/`, `cache/`, `environment/`,
+  `tmp/`.
+- `.dockerignore` — wyklucza `upload/` (~6 GB) i dumpy `*.sql` (766 MB) z kontekstu builda (i tak
+  montowane później jako wolumen, nie kopiowane w Dockerfile).
+- `config/config.docker.php.example` — szablon `config/config.php` pod produkcję: `DB_HOST=database`
+  (nazwa usługi w zewnętrznej sieci bazy danych, nie nowy hostname), `DB_NAME`/`DB_USER=fo23`,
+  `ROOT_URL` — placeholder domeny do podmiany na docelową.
+- `config/PRODUCTION_DB_SETUP.sql` — jednorazowy skrypt do uruchomienia na serwerze (`docker compose
+  exec database mysql -u root -p < ...`) tworzący bazę `fo23` i usera `fo23` w **istniejącym**
+  kontenerze MySQL. Nie uruchomione automatycznie — wymaga hasła roota z produkcji.
+- `deploy.sh` / `update.sh` — bez kroków Composer/Doctrine (Feng Office nie ma menedżera
+  zależności ani migracji) — `deploy.sh` dodatkowo czyści `cache/` (autoloader odbudowuje się
+  automatycznie) i ustawia `www-data:www-data` na `upload/`/`cache/`/`tmp/`.
+
+### Do zrobienia (poza tą sesją, wymaga dostępu do docelowego serwera)
+- Utworzyć katalog projektu na serwerze, `git clone`/`rsync` repo (bez `upload/` i dumpów —
+  te trzeba przenieść osobno, rsync z obecnej produkcji PHP 5.5).
+- Dostosować nazwę zewnętrznej sieci Dockera w `docker-compose.yml` do tej faktycznie utworzonej
+  przez istniejący kontener bazy danych na docelowym serwerze.
+- Uruchomić `config/PRODUCTION_DB_SETUP.sql` na kontenerze bazy, zaimportować dump danych
+  (`kopia_fo23_*.sql`) do nowo utworzonej bazy `fo23`.
+- Skopiować `config/config.docker.php.example` → `config/config.php` na serwerze, wpisać
+  wygenerowane hasło DB i docelową domenę.
+- Skonfigurować reverse proxy / proxy manager pod docelową domenę → port `web`.
+- `docker compose up -d --build`, potem `chown -R www-data:www-data upload cache tmp`.
+
+## 2026-09-03 (część 4): pełna obsługa zadań (widok, edycja, nowe zadanie, filtrowanie)
+
+Zgłoszenia po części 3: nie można wejść w szczegóły zadania, formularz edycji miał puste pola,
+zawężanie listy zadań przez obszar roboczy/tag nie działało, "Nowe zadanie" nie działało. Wszystkie
+cztery okazały się tą samą kaskadą co poprzednio — naprawione i zweryfikowane wizualnie (wejście
+w zadanie, edycja z wypełnionymi polami, nowe zadanie, filtrowanie przez obszar roboczy + tag
+łącznie).
+
+### Naprawione — `Hook::fire()` z przypisaniem jako argument przez referencję
+
+`Hook::fire("...", $object, $ret = 0)` — trzeci parametr `Hook::fire` jest zadeklarowany jako
+`&$ret` (przez referencję). Przekazanie wyrażenia przypisania `$ret = 0` zamiast gotowej zmiennej
+było tolerowane w PHP 7 ("Only variables should be passed by reference"), w PHP 8 jest fatalne.
+Naprawione w `application/views/co/view.php` i `application/views/co/properties.php` przez
+rozbicie na `$ret = 0;` + `Hook::fire(..., $ret);`.
+
+### Naprawione — biblioteka HTMLPurifier i inne third-party: składnia `{}` dla offsetu stringa
+
+Blokowało to renderowanie KAŻDEGO opisu zadania/komentarza przechodzącego przez `purify_html()`
+(fatal parse error przy pierwszym użyciu, więc każdy widok zadania z opisem od razu się wysypywał).
+Naprawione we wszystkich znalezionych wystąpieniach w `library/htmlpurifier/
+HTMLPurifier.standalone.php` (3 miejsca) oraz skryptowo w 19 innych plikach bibliotek third-party
+(`library/utf8/*`, `library/json/JSON.class.php`, `library/swift/*`, `library/zend/Zend/
+Search/Lucene/*`, `library/PEAR/*` i inne) — składnia `$var{offset}` usunięta w PHP 8.0, zastąpiona
+`$var[offset]` (identyczna semantyka, zero zmiany zachowania). Jeden plik (`library/PEAR/HTTP/
+Request.php`) ma dodatkowo pre-existing, niezwiązany błąd (`&new` - referencyjny `new`, usunięty w
+PHP 7) — potwierdzone, że ta klasa (PEAR `HTTP_Request`) nie jest nigdzie używana w aplikacji,
+zostawione bez zmian.
+
+### Naprawione — kolejne metody bez `static` (ten sam wzorzec co w częściach 2-3)
+
+- `application/models/object_reminders/ObjectReminders.class.php` — 4 metody
+  (`getAllRemindersByObjectAndUser`, `getByObject`, `getDueReminders`, `findByEvent`).
+- `application/models/project_co_types/ProjectCoTypes.class.php` — `getObjectTypesByManager`
+  (blokowało formularz edycji/dodawania zadania — `add_task.php` woła ją przy budowaniu listy
+  dostępnych typów obiektów).
+- `application/models/contact_member_permissions/ContactMemberPermissions.class.php` — 5 metod
+  (`contactCanAccessMemberAll`, `contactCanReadObjectTypeinMember`,
+  `canAccessObjectTypeinMembersPermissionGroups`, `getActiveContextPermissions`,
+  `grantAllPermissions`) — blokowało sprawdzanie uprawnień przy przełączaniu kontekstu na
+  konkretny obszar roboczy (`application/helpers/permissions.php`).
+- `application/helpers/pageactions.php` (`PageActions::clearActions`) — call site
+  `application/views/co/actions.php` zmieniony na `PageActions::instance()->clearActions()`
+  (metoda używa `$this`, więc — inaczej niż większość napraw w tej sesji — nie mogła być po
+  prostu oznaczona jako `static`).
+
+### Naprawione — luka w skryptowej naprawie z części 2/3: wywołania ze spacją przed nawiasem
+
+Wcześniejszy mechaniczny fix `ClassName::metoda(` → `ClassName::instance()->metoda(` (i analogicznie
+dla `self::`) używał wzorca wymagającego braku spacji przed `(`. Kod w kilku miejscach ma styl
+`ClassName::metoda ( ...)` (ze spacją) — te wystąpienia zostały pominięte i dopiero teraz ujawniły
+się jako kolejne fatalne błędy. Naprawione (tym samym mechanizmem, tylko z dopasowaniem spacji)
+w: `application/models/contacts/Contact.class.php`, `application/models/contact_member_permissions/
+ContactMemberPermissions.class.php`, `application/models/project_tasks/ProjectTasks.class.php`,
+`application/models/template_tasks/TemplateTasks.class.php`,
+`application/models/project_files/ProjectFiles.class.php` (plus dodanie `static` do
+`findByCSVIds`), `plugins/workspaces/hooks/workspaces_hooks.php`. Warto pamiętać o tym wariancie
+przy każdej przyszłej naprawie tego wzorca.
+
+## 2026-09-03 (część 3): zakładki Zadania/Kalendarz/Czas + brakujące ikonki
+
+Zgłoszenia użytkownika po części 2: brak ikon w "Obszarach roboczych" i w widżecie
+"Dokumenty" na dashboardzie, oraz (najważniejsze) niedziałające zakładki Zadania, Kalendarz,
+Czas. Wszystkie 5 zgłoszeń naprawione i zweryfikowane wizualnie.
+
+### Naprawione — brakujące ikonki (jedna wspólna przyczyna)
+
+`http://fo.local/s.gif` (uniwersalny 1x1 "spacer gif" ExtJS, używany wszędzie do renderowania
+ikon przez CSS `background-image` na klasie) zwracał 404 — plik `s.gif` (i `favicon.ico`)
+fizycznie leży w katalogu głównym repo, nie w `public/` (ten sam rodzaj problemu co
+`public/plugins` z poprzedniej sesji: stara struktura zakładała webroot = katalog główny, a
+migracja wprowadziła `public/` jako webroot). Skopiowano oba pliki do `public/`. Naprawiło to
+jednocześnie ikonki w "Obszarach roboczych" i w widżecie "Dokumenty" (ikony typu pliku PDF)
+na dashboardzie — obie korzystały z tego samego mechanizmu.
+
+### Naprawione — zakładka Zadania (`TaskController::new_list_tasks`)
+
+Dwie kolejne kolizje nazw metod tego samego typu co wcześniejsze `getTableName()`/
+`getCommentNum()`: `Comment::getTimeslotNum()`… a właściwie **`Timeslot::getTimeslotNum()`**
+w `application/models/timeslots/Timeslot.class.php` kolidowało z
+`ContentDataObject::getTimeslotNum(Timeslot $timeslot)` — blokowało autoload klasy `Timeslot`
+wywoływanej z `ProjectTasks::getArrayInfo()` → `getOpenTimeslots()`. Dodano zgodny (nullable)
+parametr, metoda nieużywana z zewnątrz.
+
+### Naprawione — zakładka Kalendarz (`event/calendar.php`)
+
+`ProjectTasks::getRangeTasksByUser()` i 5 innych metod w `ProjectTasks.class.php`
+(`maxOrder`, `createTaskCopy`, `copySubTasks`, `findByRelated`, `findByTaskAndRelated`) nie
+były oznaczone `static`, mimo że wołane statycznie w kilku miejscach (w tym rekurencyjnie
+wewnątrz samej klasy — `copySubTasks` woła `ProjectTasks::createTaskCopy(...)` i
+`ProjectTasks::copySubTasks(...)`). Żadna nie używa `$this` → bezpieczne dodanie `static`.
+(`findByRelatedCached` zostawiona bez zmian - używa `$this`.)
+
+### Naprawione — zakładka Czas (`TimeController::index`)
+
+`ContentDataObjects::populateTimeslots()` wołane statycznie na klasie abstrakcyjnej z
+`ProjectTasks::populateTimeslots($tasks)` — metoda operuje wyłącznie na przekazanym
+argumencie `$objects_list`, nie na `$this`, więc (w przeciwieństwie do `listing()` z części 2)
+wystarczyło dodać `static` bez potrzeby tworzenia dodatkowej "bezosobowej" klasy.
+
 ## 2026-09-03 (część 2): pełny dashboard z realnymi danymi po zalogowaniu
 
 Kontynuacja tej samej sesji — po naprawieniu "pustego body" (patrz część 1 niżej) okazało się,
