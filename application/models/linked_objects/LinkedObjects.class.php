@@ -15,7 +15,7 @@
     * @return array
     */
     static function getRelationsByObject(ApplicationDataObject $object) {
-      return self::findAll(array(
+      return self::instance()->findAll(array(
         'conditions' => array('(`rel_object_id` = ?) or (`object_id` = ?)', 
         		$object->getObjectId(), $object->getObjectId()),
         'order' => '`created_on`'
@@ -63,7 +63,7 @@
     * @return boolean
     */
     static function clearRelationsByObject(ApplicationDataObject $object) {
-      return self::delete(array('(`object_id` = ?) or (`rel_object_id` = ?)', 
+      return self::instance()->delete(array('(`object_id` = ?) or (`rel_object_id` = ?)', 
       $object->getId(), $object->getId()));
     } // clearRelationsByObject
     

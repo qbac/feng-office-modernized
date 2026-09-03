@@ -14,7 +14,7 @@ class CustomPropertyValues extends BaseCustomPropertyValues {
 	 * @return array
 	 */
 	static function getCustomPropertyValue($object_id, $custom_property_id) {
-		return self::findOne(array(
+		return self::instance()->findOne(array(
 			'conditions' => array("`object_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)
 		)); // findOne
 	} //  getCustomPropertyValue
@@ -27,7 +27,7 @@ class CustomPropertyValues extends BaseCustomPropertyValues {
 	 * @return array
 	 */
 	static function getCustomPropertyValues($object_id, $custom_property_id) {
-		return self::findAll(array(
+		return self::instance()->findAll(array(
 			'conditions' => array("`object_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)
 		)); // findAll
 	} //  getCustomPropertyValue
@@ -40,7 +40,7 @@ class CustomPropertyValues extends BaseCustomPropertyValues {
 	 * 
 	 */
 	static function deleteCustomPropertyValues($object_id, $custom_property_id) {
-		return self::delete(array("`object_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)); 
+		return self::instance()->delete(array("`object_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)); 
 	} //  deleteCustomPropertyValues
 	
 	/**
@@ -50,7 +50,7 @@ class CustomPropertyValues extends BaseCustomPropertyValues {
 	 * @return array
 	 */
 	static function getCustomPropertyValueCount($object) {
-		return count(self::findAll(array(
+		return count(self::instance()->findAll(array(
 			'conditions' => array("`object_id` = ? AND `custom_property_id` in (SELECT `id` FROM " . CustomProperties::instance()->getTableName(true) . " where `object_type_id` = ?)"  , $object->getObjectId(), $object->getObjectTypeId())
 		))); // findAll
 	} //  getCustomPropertyValue

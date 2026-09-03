@@ -60,7 +60,7 @@ abstract class ContentDataObjects extends DataManager {
 	 * This method is required to be overriden by classes that manage 'dimension_objects'
 	 */
 	function newDimensionObject() {
-		$ot = ObjectTypes::findById($this->getObjectTypeId());
+		$ot = ObjectTypes::instance()->findById($this->getObjectTypeId());
 		eval('$manager = '.$ot->getHandlerClass().'::instance();');
 		eval('$object = new '.$manager->getItemClass().'();');
 		return $object;
@@ -94,7 +94,7 @@ abstract class ContentDataObjects extends DataManager {
 	 * @author Pepe
 	 */
 	/*
-	function paginate($arguments = null, $items_per_page = 10, $current_page = 1) {
+	function paginate($arguments = null, $items_per_page = 10, $current_page = 1, $count = null) {
 	
 		
 		if (isset ( $this ) && instance_of ( $this, 'ContentDataObjects' )) {
@@ -131,7 +131,7 @@ abstract class ContentDataObjects extends DataManager {
 			$pagination = new DataPagination ( $total , $items_per_page, $current_page );
 			return array ($objects, $pagination );
 		} else {
-			return ContentDataObjects::instance()->paginate ( $arguments, $items_per_page, $current_page );
+			return ContentDataObjects::instance()->paginate($arguments, $items_per_page, $current_page, $count);
 		} // if
     } // paginate
 
@@ -213,7 +213,7 @@ abstract class ContentDataObjects extends DataManager {
 
       // Empty?
       if(!is_array($rows) || (count($rows) < 1)) return null;
-      
+
       // return only ids?
       if ($id) {
       	$ids = array();
@@ -222,7 +222,7 @@ abstract class ContentDataObjects extends DataManager {
       	}
       	return $ids;
       }
-      
+
       // If we have one load it, else loop and load many
       if($one) {
         return $this->loadFromRow($rows[0]);
@@ -324,7 +324,7 @@ abstract class ContentDataObjects extends DataManager {
 	function findById($id, $force_reload = false) {
 		$co = parent::findById($id, $force_reload);
 		if (!is_null($co)) {
-			$co->setObject(Objects::findById($id, $force_reload));
+			$co->setObject(Objects::instance()->findById($id, $force_reload));
 		}
 		return $co;
 	}
@@ -389,7 +389,7 @@ abstract class ContentDataObjects extends DataManager {
 	
 		if ($type_id){
 			// If isset type, is a concrete instance linsting. Otherwise is a generic listing of objects
-			$type = ObjectTypes::findById($type_id); /* @var $object_type ObjectType */
+			$type = ObjectTypes::instance()->findById($type_id); /* @var $object_type ObjectType */
 			$handler_class = $type->getHandlerClass();
 			$table_name = self::getTableName();
 			
@@ -772,7 +772,7 @@ abstract class ContentDataObjects extends DataManager {
     		return self::prepareAssociationConditions($redefined_context, $context_dimensions, $properties, $object_type_id, $pg_ids, $selection_members);
 	    }
     	
-    	$dimensions = Dimensions::findAll();
+    	$dimensions = Dimensions::instance()->findAll();
     	foreach ($dimensions as $dimension){
     		if ($dimension->canContainObjects() && !in_array($dimension, $context) && !in_array($dimension, $selected_dimensions) &&
     			!($dimension->getOptions(1) && isset($dimension->getOptions(1)->hidden) && $dimension->getOptions(1)->hidden)){
@@ -877,7 +877,7 @@ abstract class ContentDataObjects extends DataManager {
 	    		else $member_ids = $member_intersection;
 	    		$association_conditions.= self::prepareQuery($association_conditions, $dimension, $member_ids,$object_type_id, $pg_ids, 'AND', $selection_members);
     	}
-    	$dims = Dimensions::findAll();
+    	$dims = Dimensions::instance()->findAll();
     	foreach ($dims as $dim){
     		if (!in_array($dim->getId(), $redefined_context) && !isset($properties[$dim->getId()]) && $dim->canContainObjects()){
     			$member_ids = array();

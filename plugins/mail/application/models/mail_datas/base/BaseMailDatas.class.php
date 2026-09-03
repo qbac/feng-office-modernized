@@ -46,7 +46,7 @@ abstract class BaseMailDatas extends DataManager {
 	 * @param void
 	 * @return array
 	 */
-	function getColumns() {
+	static function getColumns() {
 		return array_keys(self::$columns);
 	} // getColumns
 
@@ -225,7 +225,7 @@ abstract class BaseMailDatas extends DataManager {
 	 *
 	 * @return MailDatas
 	 */
-	function instance() {
+	static function instance() {
 		static $instance;
 		if(!instance_of($instance, 'MailDatas')) {
 			$instance = new MailDatas();

@@ -33,7 +33,7 @@ if (!$max_events_to_show) $max_events_to_show = 3;
 	$status_filter = $userPreferences['status_filter'];
         $task_filter = $userPreferences['task_filter'];
 	
-	$user = Contacts::findById(array('id' => $user_filter));
+	$user = Contacts::instance()->findById(array('id' => $user_filter));
 	if ($user == null) $user = logged_user();
 	
 	$use_24_hours = user_config_option('time_format_use_24');

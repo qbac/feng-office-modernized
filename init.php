@@ -113,7 +113,7 @@ foreach ($callbacks as $callback) {
 //if(Env::isDebugging()) {
 	Logger::setSession(new Logger_Session('default'));
 	Logger::setBackend(new Logger_Backend_File(CACHE_DIR . '/log.php'));
-	 
+
 	set_error_handler('__production_error_handler');
 	set_exception_handler('__production_exception_handler');
 /*} else {
@@ -135,7 +135,8 @@ try {
 	if(defined('DB_CHARSET') && trim(DB_CHARSET)) {
 		DB::execute("SET NAMES ?", DB_CHARSET);
 	} // if
-} catch(Exception $e) {
+} catch(Throwable $e) {
+	// PHP 7+ dzieli Exception/Error - catch(Exception) nie łapał np. DBConnectError (extends Error)
 	if(Env::isDebugging()) {
 		Env::dumpError($e);
 	} else {
@@ -172,7 +173,8 @@ try {
 	if (!defined( 'CONSOLE_MODE' )) {
 		Env::executeAction(request_controller(), request_action()) ;
 	}
-} catch(Exception $e) {
+} catch(Throwable $e) {
+	// PHP 7+ dzieli Exception/Error - catch(Exception) nie łapał np. Error rzucanych z rdzenia
 	if(Env::isDebugging()) {
 		Logger::log($e, Logger::FATAL);
 		Env::dumpError($e);

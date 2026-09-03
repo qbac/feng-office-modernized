@@ -16,7 +16,7 @@
 	$token = array_var($argv, 3);
 	
 	// log user in
-	$user = Contacts::findById($user_id);
+	$user = Contacts::instance()->findById($user_id);
 	if(!($user instanceof Contact) || !$user->isValidToken($token)) {
 		throw new Exception("Cannot login with user $user_id and token '$token'");
 	}
@@ -29,7 +29,7 @@
 	
 	$permissions = file_get_contents($permissions_filename);
 	
-	$member = Members::findById($member_id);
+	$member = Members::instance()->findById($member_id);
 	if ($member instanceof Member) {
 		// transaction to save permission tables
 		try {

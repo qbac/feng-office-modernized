@@ -68,7 +68,7 @@ function render_system_notices(Contact $user) {
  */
 function select_company($name, $selected = null, $attributes = null, $allow_none = true, $check_permissions = false) {
 	if (!$check_permissions) {
-		$companies = Contacts::findAll(array('conditions' => 'is_company = 1 AND trashed_by_id = 0 AND archived_by_id = 0 ', 'order' => 'first_name ASC'));
+		$companies = Contacts::instance()->findAll(array('conditions' => 'is_company = 1 AND trashed_by_id = 0 AND archived_by_id = 0 ', 'order' => 'first_name ASC'));
 	} else {
 		$companies = Contacts::getVisibleCompanies(logged_user(), "`id` <> " . owner_company()->getId());
 		if (logged_user()->isMemberOfOwnerCompany() || owner_company()->canAddUser(logged_user())) {
@@ -181,7 +181,7 @@ function allowed_users_to_assign($context = null) {
 	}
 	
 	// only companies with users
-	$companies = Contacts::findAll(array("conditions" => "is_company = 1 AND object_id IN (SELECT company_id FROM ".TABLE_PREFIX."contacts WHERE user_type>0 AND disabled=0)", "order" => "first_name, surname"));
+	$companies = Contacts::instance()->findAll(array("conditions" => "is_company = 1 AND object_id IN (SELECT company_id FROM ".TABLE_PREFIX."contacts WHERE user_type>0 AND disabled=0)", "order" => "first_name, surname"));
 
 	$comp_ids = array("0");
 	$comp_array = array("0" => array('id' => "0", 'name' => lang('without company'), 'users' => array() ));
@@ -218,14 +218,14 @@ function allowed_users_to_assign_all_mobile($member_id = null) {
 	if ($member_id == null) {
 		$context = active_context();
 	}else{
-		$member = Members::findById($member_id);
+		$member = Members::instance()->findById($member_id);
 		if ($member instanceof Member){
 			$context[] = $member;
 		}
 	}
 	
 	// only companies with users
-	$companies = Contacts::findAll(array("conditions" => "is_company = 1 AND object_id IN (SELECT company_id FROM ".TABLE_PREFIX."contacts WHERE user_type>0 AND disabled=0)", "order" => "first_name ASC"));
+	$companies = Contacts::instance()->findAll(array("conditions" => "is_company = 1 AND object_id IN (SELECT company_id FROM ".TABLE_PREFIX."contacts WHERE user_type>0 AND disabled=0)", "order" => "first_name ASC"));
 
 	$comp_ids = array("0");
 	$comp_array = array("0" => array('id' => "0", 'name' => lang('without company'), 'users' => array() ));
@@ -353,7 +353,7 @@ function select_milestone($name, $context = null, $selected = null, $attributes 
 		}else{
 			$conditions = '`session_id` =  '.logged_user()->getId();
 		}
-		$milestones = TemplateMilestones::findAll(array('conditions' => $conditions));
+		$milestones = TemplateMilestones::instance()->findAll(array('conditions' => $conditions));
 	}
 	
 	if(is_array($attributes)) {
@@ -933,7 +933,7 @@ function render_add_reminders($object, $context, $defaults = null, $genid = null
 	if (is_null($genid)) {
 		$genid = gen_id();
 	}
-	$types = ObjectReminderTypes::findAll();
+	$types = ObjectReminderTypes::instance()->findAll();
 	$typecsv = "";
 	foreach ($types as $type) {
 		if ($typecsv != "") {
@@ -989,7 +989,7 @@ function render_add_reminders_config($reminder_opt) {
 	foreach ($default_defaults as $k => $v) {
 		if (!isset($defaults[$k])) $defaults[$k] = $v;
 	}
-	$types = ObjectReminderTypes::findAll();
+	$types = ObjectReminderTypes::instance()->findAll();
 	$typecsv = array();
 	foreach ($types as $type) {
 		$typecsv []= $type->getName();
@@ -1181,7 +1181,7 @@ function filter_assigned_to_select_box($list_name, $project = null, $selected = 
 	
 	if(is_array($grouped_users) && count($grouped_users)) {
 		foreach($grouped_users as $company_id => $users) {
-			$company = Contacts::findById($company_id);
+			$company = Contacts::instance()->findById($company_id);
 			if(!($company instanceof Contact)) {
 				continue;
 			} // if

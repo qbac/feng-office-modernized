@@ -15,9 +15,9 @@
 		if ($p instanceof Member) $member_color = $p->getColor();
 	}
 	
-	$object_type_selected = $obj_type_sel > 0 ? ObjectTypes::findById($obj_type_sel) : null;
+	$object_type_selected = $obj_type_sel > 0 ? ObjectTypes::instance()->findById($obj_type_sel) : null;
 	if ($member instanceof Member && !$member->isNew()) {
-		$object_type_name = lang(ObjectTypes::findById($member->getObjectTypeId())->getName());
+		$object_type_name = lang(ObjectTypes::instance()->findById($member->getObjectTypeId())->getName());
 	} else {
 		$object_type_name = $object_type_selected instanceof ObjectType ? lang($object_type_selected->getName()) : null;
 	}
@@ -25,7 +25,7 @@
 		$member->setObjectTypeId($obj_type_sel);
 	}
 	if($member instanceof Member && !$member->isNew()) {
-		$ot = ObjectTypes::findById($member->getObjectTypeId());
+		$ot = ObjectTypes::instance()->findById($member->getObjectTypeId());
 		$ot_name = lang($ot->getName());
 		if ($member->getArchivedById() == 0) {
 			add_page_action(lang('archive'), "javascript:if(confirm('".lang('confirm archive member',$ot_name)."')) og.openLink('".get_url('member', 'archive', array('id' => $member->getId()))."');", 'ico-archive-obj');

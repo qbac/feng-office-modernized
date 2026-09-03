@@ -65,7 +65,7 @@ class FilesController extends ApplicationController {
 	function file_details() {
 		$this->addHelper('textile');
 		
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			ajx_current("empty");
@@ -131,7 +131,7 @@ class FilesController extends ApplicationController {
 
 		$inline = (boolean) array_var($_GET, 'inline', false);
 		
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			return;
@@ -193,7 +193,7 @@ class FilesController extends ApplicationController {
 	function download_image() {
 		$inline = (boolean) array_var($_GET, 'inline', false);
 			
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			ajx_current("empty");
@@ -214,7 +214,7 @@ class FilesController extends ApplicationController {
 	function checkout_file()
 	{
 		ajx_current("empty");
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			return;
@@ -243,7 +243,7 @@ class FilesController extends ApplicationController {
 	
 	function undo_checkout(){
 		ajx_current("empty");
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!$file instanceof ProjectFile) {
 			flash_error(lang('file dnx'));
 			return;
@@ -278,7 +278,7 @@ class FilesController extends ApplicationController {
 	 */
 	function download_revision() {
 		$inline = (boolean) array_var($_GET, 'inline', false);
-		$revision = ProjectFileRevisions::findById(get_id());
+		$revision = ProjectFileRevisions::instance()->findById(get_id());
 		if(!($revision instanceof ProjectFileRevision)) {
 			flash_error(lang('file revision dnx'));
 			ajx_current("empty");
@@ -415,7 +415,7 @@ class FilesController extends ApplicationController {
 				DB::beginWork();
 				if ($upload_option && $upload_option != -1){
 					$skipSettings = true;
-					$file = ProjectFiles::findById($upload_option);
+					$file = ProjectFiles::instance()->findById($upload_option);
 					$old_subs = $file->getSubscribers();
 					
 					// Mantain old subscribers
@@ -556,7 +556,7 @@ class FilesController extends ApplicationController {
 	function add_file_from_multi($file_data, $uploaded_file, $member_ids, $upload_option) {
 		try {
 			if($upload_option != -1){
-				$file = ProjectFiles::findById($upload_option);
+				$file = ProjectFiles::instance()->findById($upload_option);
 			}else{
 				$file = new ProjectFile();
 			}			
@@ -669,7 +669,7 @@ class FilesController extends ApplicationController {
 				$file_titles = "";
 				//data to return
 				foreach ($file_ids as $file_id) {
-					$file_to_ret = ProjectFiles::findById($file_id);
+					$file_to_ret = ProjectFiles::instance()->findById($file_id);
 					if($file_to_ret instanceof ProjectFile){
 						$ajx_file["file"][]= get_class($file_to_ret->manager()) . ':' . $file_to_ret->getId();
 						$file_titles .= ($file_titles == "" ? "" : ", ") . $file_to_ret->getFilename();
@@ -725,7 +725,7 @@ class FilesController extends ApplicationController {
 				$uploading_revision_for_existing_file = false;
 				$file_id = array_var($file_data, 'new_rev_file_id');
 				if ($file_id > 0) {
-					$f = ProjectFiles::findById($file_id);
+					$f = ProjectFiles::instance()->findById($file_id);
 					if ($f instanceof ProjectFile) {
 						$file = $f;
 						$uploading_revision_for_existing_file = true;
@@ -905,7 +905,7 @@ class FilesController extends ApplicationController {
 				//data to return
 				$files_data_to_return = array();
 				foreach ($file_ids as $file_id) {
-					$file_to_ret = ProjectFiles::findById($file_id);
+					$file_to_ret = ProjectFiles::instance()->findById($file_id);
 					if (!$file_to_ret instanceof ProjectFile) continue;
 					$file_data = array();
 					$file_data["file_id"] = $file_to_ret->getId();
@@ -1010,7 +1010,7 @@ class FilesController extends ApplicationController {
 		if($fileId > 0) {
 			//edit document
 			try {
-				$file = ProjectFiles::findById($fileId);
+				$file = ProjectFiles::instance()->findById($fileId);
 				if (!$file->canEdit(logged_user())) {
 					flash_error(lang('no access permissions'));
 					ajx_current("empty");
@@ -1061,7 +1061,7 @@ class FilesController extends ApplicationController {
 				$object_controller = new ObjectController();
 				$file_member_ids = $file->getMemberIds();
 				if (count($image_file_ids) > 0) {
-					$image_files = ProjectFiles::findAll(array('conditions' => 'id IN ('.implode(',',$image_file_ids).')'));
+					$image_files = ProjectFiles::instance()->findAll(array('conditions' => 'id IN ('.implode(',',$image_file_ids).')'));
 					foreach ($image_files as $img_file) {
 						$object_controller->add_to_members($img_file, $file_member_ids, null, false);
 						$img_file->setMailId($file->getId());
@@ -1160,7 +1160,7 @@ class FilesController extends ApplicationController {
 				$object_controller->add_to_members($file, $member_ids);
 				
 				if (count($image_file_ids) > 0) {
-					$image_files = ProjectFiles::findAll(array('conditions' => 'id IN ('.implode(',',$image_file_ids).')'));
+					$image_files = ProjectFiles::instance()->findAll(array('conditions' => 'id IN ('.implode(',',$image_file_ids).')'));
 					foreach ($image_files as $img_file) {
 						$object_controller->add_to_members($img_file, $member_ids, null, false);
 						$img_file->setMailId($file->getId());
@@ -1201,7 +1201,7 @@ class FilesController extends ApplicationController {
 		if($fileid > 0) {
 			//edit presentation
 			try {
-				$file = ProjectFiles::findById($fileid);
+				$file = ProjectFiles::instance()->findById($fileid);
 				if (!$file->canEdit(logged_user())) {
 					flash_error(lang('no access permissions'));
 					ajx_current("empty");
@@ -1326,7 +1326,7 @@ class FilesController extends ApplicationController {
 			//edit spreadsheet
 			if ($name == '') $name = $file->getFilename();
 			try {
-				$file = ProjectFiles::findById(get_id());
+				$file = ProjectFiles::instance()->findById(get_id());
 				if (!$file->canEdit(logged_user())) {
 					flash_error(lang('no access permissions'));
 					ajx_current("empty");
@@ -1424,7 +1424,7 @@ class FilesController extends ApplicationController {
 		$file_data = array_var($_POST, 'file');
 		if (!isset($file_data)) {
 			// open text file
-			$file = ProjectFiles::findById(get_id());
+			$file = ProjectFiles::instance()->findById(get_id());
 			if (!($file instanceof ProjectFile)) {
 				flash_error(lang('file dnx'));
 				ajx_current("empty");
@@ -1443,7 +1443,7 @@ class FilesController extends ApplicationController {
 			ajx_current("empty");
 			// save new file content
 			try {
-				$file = ProjectFiles::findById(array_var($file_data, 'id'));
+				$file = ProjectFiles::instance()->findById(array_var($file_data, 'id'));
 				if (!($file instanceof ProjectFile)) {
 					flash_error(lang('file dnx'));
 					ajx_current("empty");
@@ -1495,7 +1495,7 @@ class FilesController extends ApplicationController {
 			try {
 				DB::beginWork();
 				
-				$file = ProjectFiles::findById(get_id());
+				$file = ProjectFiles::instance()->findById(get_id());
 				if (!($file instanceof ProjectFile)) {
 					throw new Exception(lang('file dnx'));
 				}
@@ -1551,7 +1551,7 @@ class FilesController extends ApplicationController {
 		}
 		if (get_id() > 0) {
 			//open a spreadsheet
-			$file = ProjectFiles::findById(get_id());
+			$file = ProjectFiles::instance()->findById(get_id());
 			if(!($file instanceof ProjectFile)) {
 				flash_error(lang('file dnx'));
 				ajx_current("empty");
@@ -1590,7 +1590,7 @@ class FilesController extends ApplicationController {
 			try {
 				DB::beginWork();
 				$this->setTemplate('add_presentation');
-				$file = ProjectFiles::findById(get_id());
+				$file = ProjectFiles::instance()->findById(get_id());
 	
 				if (!($file instanceof ProjectFile)) {
 					throw new Exception(lang('file dnx'));
@@ -1665,7 +1665,7 @@ class FilesController extends ApplicationController {
 			$ids = explode(',', array_var($_GET, 'objects'));
 			$succ = 0; $err = 0;
 			foreach ($ids as $id) {
-				$file = ProjectFiles::findById($id);
+				$file = ProjectFiles::instance()->findById($id);
 				if (isset($file) && $file->canDelete(logged_user())) {
 					try{
 						DB::beginWork();
@@ -1691,7 +1691,7 @@ class FilesController extends ApplicationController {
 			$ids = explode(',', array_var($_GET, 'objects'));
 			$succ = 0; $err = 0;
 				foreach ($ids as $id) {
-				$file = ProjectFiles::findById($id);
+				$file = ProjectFiles::instance()->findById($id);
 					try {
 						$file->setIsRead(logged_user()->getId(),true);
 						$succ++;
@@ -1707,7 +1707,7 @@ class FilesController extends ApplicationController {
 			$ids = explode(',', array_var($_GET, 'objects'));
 			$succ = 0; $err = 0;
 				foreach ($ids as $id) {
-				$file = ProjectFiles::findById($id);
+				$file = ProjectFiles::instance()->findById($id);
 					try {
 						$file->setIsRead(logged_user()->getId(),false);
 						$succ++;
@@ -1726,7 +1726,7 @@ class FilesController extends ApplicationController {
 			$ids = explode(',', array_var($_GET, 'ids'));
 			$succ = 0; $err = 0;
 			foreach ($ids as $id) {
-				$file = ProjectFiles::findById($id);
+				$file = ProjectFiles::instance()->findById($id);
 				if (isset($file) && $file->canEdit(logged_user())) {
 					try{
 						DB::beginWork();
@@ -1833,7 +1833,7 @@ class FilesController extends ApplicationController {
 					if ($coId == logged_user()->getId()) {
 						$coName = "self";
 					} else {
-						$coUser = Contacts::findById($coId);
+						$coUser = Contacts::instance()->findById($coId);
 						if ($coUser instanceof Contact) {
 							$coName = $coUser->getObjectName();
 						} else {
@@ -1892,7 +1892,7 @@ class FilesController extends ApplicationController {
 				foreach ($custom_properties as $cp) {
 					$cp_value = CustomPropertyValues::getCustomPropertyValues($o->getId(), $cp->getId());
 					if ($cp->getType() == 'contact' && $cp_value[0] instanceof CustomPropertyValue) {
-						$contact = Contacts::findById($cp_value[0]->getValue());
+						$contact = Contacts::instance()->findById($cp_value[0]->getValue());
 						if ($contact instanceof Contact) $cp_value[0]->setValue($contact->getObjectName());
 					}
 					for ($j = 0; $j < count($cp_value); $j++){
@@ -1923,7 +1923,7 @@ class FilesController extends ApplicationController {
 	
 	function open_file() {
 		$fileId = $_GET['id'];
-		$file = ProjectFiles::findById($fileId);
+		$file = ProjectFiles::instance()->findById($fileId);
 		if (!$file->canEdit(logged_user())) {
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -1952,7 +1952,7 @@ class FilesController extends ApplicationController {
 		}
 		$this->setTemplate('add_file');
 
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			ajx_current("empty");
@@ -2077,7 +2077,7 @@ class FilesController extends ApplicationController {
 		}
 		$this->setTemplate('add_weblink');
 		
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
@@ -2151,7 +2151,7 @@ class FilesController extends ApplicationController {
 	function release_file() {
 		ajx_current("empty");
 		$id = array_var($_GET, 'id');
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if ($file instanceof ProjectFile) {
 			$file->cancelCheckOut();
 		}
@@ -2171,7 +2171,7 @@ class FilesController extends ApplicationController {
 	function checkin_file() {
 		$this->setTemplate('add_file');
 
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			ajx_current("empty");
@@ -2261,7 +2261,7 @@ class FilesController extends ApplicationController {
 			ajx_current("empty");
 			return;
 		}
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			ajx_current("empty");
@@ -2366,7 +2366,7 @@ class FilesController extends ApplicationController {
 		}
 		$this->setTemplate('add_file_revision');
 			
-		$revision = ProjectFileRevisions::findById(get_id());
+		$revision = ProjectFileRevisions::instance()->findById(get_id());
 		if(!($revision instanceof ProjectFileRevision)) {
 			flash_error(lang('file revision dnx'));
 			ajx_current("empty");
@@ -2430,7 +2430,7 @@ class FilesController extends ApplicationController {
 			ajx_current("empty");
 			return;
 		}
-		$revision = ProjectFileRevisions::findById(get_id());
+		$revision = ProjectFileRevisions::instance()->findById(get_id());
 		if(!($revision instanceof ProjectFileRevision)) {
 			flash_error(lang('file revision dnx'));
 			ajx_current("empty");
@@ -2516,7 +2516,7 @@ class FilesController extends ApplicationController {
 		}
 		ajx_set_no_toolbar();
 		$id = get_id();
-		$file = ProjectFiles::findById($id);
+		$file = ProjectFiles::instance()->findById($id);
 		if (!$file instanceof ProjectFile) {
 			flash_error("file dnx");
 			ajx_current("empty");
@@ -2594,7 +2594,7 @@ class FilesController extends ApplicationController {
 			return;
 		}
 
-		$file = ProjectFiles::findById($fileId);
+		$file = ProjectFiles::instance()->findById($fileId);
 		if (!$file->canEdit(logged_user())) {
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -2715,7 +2715,7 @@ class FilesController extends ApplicationController {
 			$filename = array_var($_GET, 'filename');
 			$isnew = true;
 		} else if (array_var($_GET, 'id')) {
-			$file = ProjectFiles::findById(array_var($_GET, 'id'));
+			$file = ProjectFiles::instance()->findById(array_var($_GET, 'id'));
 			$filename = $file->getFilename();
 		}
 		
@@ -2779,7 +2779,7 @@ class FilesController extends ApplicationController {
 //			$filename = array_var($_GET, 'filename');
 //			$isnew = true;
 //		} else if (array_var($_GET, 'id')) {
-//			$file = ProjectFiles::findById(array_var($_GET, 'id'));
+//			$file = ProjectFiles::instance()->findById(array_var($_GET, 'id'));
 //			$filename = $file->getFilename();
 //		}
 //		
@@ -2821,7 +2821,7 @@ class FilesController extends ApplicationController {
 	
 	function display_content() {
 		
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if (!$file instanceof ProjectFile) {
 			die(lang("file dnx"));
 		}
@@ -2956,7 +2956,7 @@ class FilesController extends ApplicationController {
 	
 	function reload_file_view() {
 		ajx_current("reload");
-		$file = ProjectFiles::findById(get_id());
+		$file = ProjectFiles::instance()->findById(get_id());
 		if(!($file instanceof ProjectFile)) {
 			flash_error(lang('file dnx'));
 			return;

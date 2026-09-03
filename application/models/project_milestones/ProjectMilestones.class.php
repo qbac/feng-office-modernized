@@ -58,7 +58,7 @@ class ProjectMilestones extends BaseProjectMilestones {
 		}
 		
 		$conditions = "trashed_by_id = 0 AND archived_by_id = 0 AND $permission_conditions $member_conditions";
-		$milestones = ProjectMilestones::findAll(array('conditions' => $conditions, 'order' => 'name'));
+		$milestones = ProjectMilestones::instance()->findAll(array('conditions' => $conditions, 'order' => 'name'));
 
 		return $milestones;
 	} // getActiveMilestonesByUser
@@ -74,7 +74,7 @@ class ProjectMilestones extends BaseProjectMilestones {
 		if ($archived) $archived_cond = "`archived_on` <> 0 AND ";
 		else $archived_cond = "`archived_on` = 0 AND ";
 		
-		return self::findAll(array(
+		return self::instance()->findAll(array(
         	'conditions' => array('`is_template` = false AND (`assigned_to_contact_id` = ? OR `assigned_to_contact_id` = ? ) AND ' . $archived_cond . ' AND `completed_on` = ?', $contact->getId(), $contact->getCompanyId(), EMPTY_DATETIME),
         	'order' => '`due_date`'
         )); // findAll

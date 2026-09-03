@@ -188,7 +188,7 @@ class ProjectTasks extends BaseProjectTasks {
 		if (!SystemPermissions::userHasSystemPermission(logged_user(), 'can_see_assigned_to_other_tasks')) {
 			$conditions .= " AND assigned_to_contact_id = ".logged_user()->getId();
 		} else {
-			$user = Contacts::findById($user_id);
+			$user = Contacts::instance()->findById($user_id);
 			if ($user instanceof Contact) {
 				$conditions .= " AND assigned_to_contact_id = ".$user->getId();
 			}
@@ -212,7 +212,7 @@ class ProjectTasks extends BaseProjectTasks {
 		if (!SystemPermissions::userHasSystemPermission(logged_user(), 'can_see_assigned_to_other_tasks')) {
 			$conditions_tasks .= " AND assigned_to_contact_id = ".logged_user()->getId();
 		} else {
-			$user = Contacts::findById($user_id);
+			$user = Contacts::instance()->findById($user_id);
 			if ($user instanceof Contact) {
 				$conditions_tasks .= " AND assigned_to_contact_id = ".$user->getId();
 			}
@@ -335,7 +335,7 @@ class ProjectTasks extends BaseProjectTasks {
 		// Execute query and build the resultset	
 	    $rows = DB::executeAll($sql);
 		foreach ($rows as $row) {
-    		$task =  ProjectTasks::findById($row['id']);
+    		$task =  ProjectTasks::instance()->findById($row['id']);
     		if ($task && $task instanceof ProjectTask) {
     			if($task->getDueDate()){
 	    			$k  = "#".$task->getDueDate()->getTimestamp().$task->getId();
@@ -383,17 +383,17 @@ class ProjectTasks extends BaseProjectTasks {
 		
 		$related = array_var($this->cached_related, $task_id, array());
 		if (count($related) > 0) {
-			return self::findAll(array('conditions' => 'object_id IN ('.implode(',', $related).')'));
+			return self::instance()->findAll(array('conditions' => 'object_id IN ('.implode(',', $related).')'));
 		}
 		return array();
 	}
 
 	function findByRelated($task_id) {
-		return ProjectTasks::findAll(array('conditions' => array('`original_task_id` = ?', $task_id)));
+		return ProjectTasks::instance()->findAll(array('conditions' => array('`original_task_id` = ?', $task_id)));
 	}
 
 	function findByTaskAndRelated($task_id,$original_task_id) {
-		return ProjectTasks::findAll(array('conditions' => array('(`original_task_id` = ? OR `object_id` = ?) AND `object_id` <> ?', $original_task_id,$original_task_id,$task_id)));
+		return ProjectTasks::instance()->findAll(array('conditions' => array('(`original_task_id` = ? OR `object_id` = ?) AND `object_id` <> ?', $original_task_id,$original_task_id,$task_id)));
 	}
 	
 	

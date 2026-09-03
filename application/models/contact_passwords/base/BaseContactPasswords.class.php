@@ -41,7 +41,7 @@
     * @param void
     * @return array
     */
-    function getColumns() {
+    static function getColumns() {
       return array_keys(self::$columns);
     } // getColumns
     
@@ -192,7 +192,7 @@
     *
     * @return Contacts 
     */
-    function instance() {
+    static function instance() {
       static $instance;
       if(!instance_of($instance, 'ContactPasswords')) {
         $instance = new ContactPasswords();

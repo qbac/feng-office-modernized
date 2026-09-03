@@ -49,7 +49,7 @@
     * @param void
     * @return array
     */
-    function getColumns() {
+    static function getColumns() {
       return array_keys(self::$columns);
     } // getColumns
     
@@ -203,11 +203,11 @@
     * @param integer $current_page Current page number
     * @return array
     */
-    function paginate($arguments = null, $items_per_page = 10, $current_page = 1) {
+    function paginate($arguments = null, $items_per_page = 10, $current_page = 1, $count = null) {
       if(isset($this) && instance_of($this, 'ProjectFileRevisions')) {
-        return parent::paginate($arguments, $items_per_page, $current_page);
+        return parent::paginate($arguments, $items_per_page, $current_page, $count);
       } else {
-        return ProjectFileRevisions::instance()->paginate($arguments, $items_per_page, $current_page);
+        return ProjectFileRevisions::instance()->paginate($arguments, $items_per_page, $current_page, $count);
       } // if
     } // paginate
     
@@ -216,7 +216,7 @@
     *
     * @return ProjectFileRevisions 
     */
-    function instance() {
+    static function instance() {
       static $instance;
       if(!instance_of($instance, 'ProjectFileRevisions')) {
         $instance = new ProjectFileRevisions();

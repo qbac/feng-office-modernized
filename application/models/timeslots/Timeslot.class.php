@@ -56,7 +56,7 @@ class Timeslot extends BaseTimeslot {
     */
     function getUser() {
       if(is_null($this->assigned_user)) {
-        $this->assigned_user = Contacts::findById($this->getContactId());
+        $this->assigned_user = Contacts::instance()->findById($this->getContactId());
       }
       return $this->assigned_user;
     }
@@ -130,7 +130,7 @@ class Timeslot extends BaseTimeslot {
 			$this->setEndTime($dt);
     	}
     	
-    	$task = ProjectTasks::findById($this->getRelObjectId());
+    	$task = ProjectTasks::instance()->findById($this->getRelObjectId());
 		if($task instanceof ProjectTask) {
 			$task->calculatePercentComplete();
 		}
@@ -379,7 +379,7 @@ class Timeslot extends BaseTimeslot {
 	function getArrayInfo($return_billing = false) {
 		$task_name = '';
 		
-		$user = Contacts::findById($this->getContactId());
+		$user = Contacts::instance()->findById($this->getContactId());
 		if ($user instanceof Contact) {
 			$displayname = $user->getObjectName();
 		} else {

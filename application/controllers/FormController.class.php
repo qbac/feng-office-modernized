@@ -40,7 +40,7 @@ class FormController extends ApplicationController {
 	function submit() {
 		$this->addHelper('textile');
 
-		$project_form = ProjectForms::findById(get_id());
+		$project_form = ProjectForms::instance()->findById(get_id());
 		if(!($project_form instanceof ProjectForm)) {
 			flash_error(lang('project form dnx'));
 			$this->redirectToUrl(active_project()->getOverviewUrl());
@@ -125,7 +125,7 @@ class FormController extends ApplicationController {
 			$project_form->setFromAttributes($project_form_data);
 
 			if($project_form->getAction() == ProjectForm::ADD_COMMENT_ACTION) {
-				$in_object = ProjectMessages::findById(get_id('message_id', $project_form_data));
+				$in_object = ProjectMessages::instance()->findById(get_id('message_id', $project_form_data));
 				$relation_error_message = lang('project form select message');
 			} else {
 				$in_object = ProjectTaskLists::findById(get_id('task_list_id', $project_form_data));
@@ -165,7 +165,7 @@ class FormController extends ApplicationController {
 	function edit() {
 		$this->setTemplate('add_project_form');
 
-		$project_form = ProjectForms::findById(get_id());
+		$project_form = ProjectForms::instance()->findById(get_id());
 		if(!($project_form instanceof ProjectForm)) {
 			flash_error(lang('project form dnx'));
 			if(ProjectForm::canAdd(logged_user(), active_project())) {
@@ -208,7 +208,7 @@ class FormController extends ApplicationController {
 			$project_form->setFromAttributes($project_form_data);
 
 			if($project_form->getAction() == ProjectForm::ADD_COMMENT_ACTION) {
-				$in_object = ProjectMessages::findById(get_id('message_id', $project_form_data));
+				$in_object = ProjectMessages::instance()->findById(get_id('message_id', $project_form_data));
 				$relation_error_message = lang('project form select message');
 			} else {
 				$in_object = ProjectTaskLists::findById(get_id('task_list_id', $project_form_data));
@@ -244,7 +244,7 @@ class FormController extends ApplicationController {
 	 * @return null
 	 */
 	function delete() {
-		$project_form = ProjectForms::findById(get_id());
+		$project_form = ProjectForms::instance()->findById(get_id());
 		if(!($project_form instanceof ProjectForm)) {
 			flash_error(lang('project form dnx'));
 			if(ProjectForm::canAdd(logged_user(), active_project())) {

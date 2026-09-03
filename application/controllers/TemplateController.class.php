@@ -159,8 +159,8 @@ class TemplateController extends ApplicationController {
 	function add_template_object_to_view($template_id) {
 		$objects = array();
 		$conditions = array('conditions' => '`template_id` = '.$template_id);
-		$tasks = TemplateTasks::findAll($conditions);			
-		$milestones = TemplateMilestones::findAll($conditions);	
+		$tasks = TemplateTasks::instance()->findAll($conditions);			
+		$milestones = TemplateMilestones::instance()->findAll($conditions);	
 				
 		foreach ($milestones as $milestone){
 			$objectId = $milestone->getObjectId();
@@ -213,7 +213,7 @@ class TemplateController extends ApplicationController {
 		$temp_tasks = TemplateTasks::getAllTaskTemplatesBySessionId(logged_user()->getId());
 		foreach ($temp_tasks as $tmp){
 			$id = $tmp->getId();
-			$dep = ProjectTaskDependencies::findOne(array('conditions' => "(`previous_task_id` = $id OR `task_id` = $id )"));
+			$dep = ProjectTaskDependencies::instance()->findOne(array('conditions' => "(`previous_task_id` = $id OR `task_id` = $id )"));
 			if ($dep instanceof ProjectTaskDependency) {
 				$dep->delete();				
 			} 
@@ -222,8 +222,8 @@ class TemplateController extends ApplicationController {
 		//delete obj
 		$conditions = array('conditions' => '`session_id` =  '.logged_user()->getId());
 		if(logged_user()->getId() > 0){
-			TemplateTasks::delete($conditions);
-			TemplateMilestones::delete($conditions);
+			TemplateTasks::instance()->delete($conditions);
+			TemplateMilestones::instance()->delete($conditions);
 		}
 	}
 	
@@ -238,7 +238,7 @@ class TemplateController extends ApplicationController {
 		}
 		$this->setTemplate('add');
 
-		$cotemplate = COTemplates::findById(get_id());
+		$cotemplate = COTemplates::instance()->findById(get_id());
 		if(!($cotemplate instanceof COTemplate)) {
 			flash_error(lang('template dnx'));
 			ajx_current("empty");
@@ -370,7 +370,7 @@ class TemplateController extends ApplicationController {
 			ajx_current("empty");
 			return;
 		}
-		$cotemplate = COTemplates::findById(get_id());
+		$cotemplate = COTemplates::instance()->findById(get_id());
 		if(!($cotemplate instanceof COTemplate)) {
 			flash_error(lang('template dnx'));
 			ajx_current("empty");
@@ -396,7 +396,7 @@ class TemplateController extends ApplicationController {
 			return;
 		}
 		ajx_current("empty");
-		$cotemplate = COTemplates::findById(get_id());
+		$cotemplate = COTemplates::instance()->findById(get_id());
 		if(!($cotemplate instanceof COTemplate)) {
 			flash_error(lang('template dnx'));
 			return;
@@ -441,7 +441,7 @@ class TemplateController extends ApplicationController {
 			$template_id =  array_var($template_data, 'template');
 			$go_deep = array_var($template_data, 'copy-tasks',false);
 						
-			$template = COTemplates::findById($template_id);
+			$template = COTemplates::instance()->findById($template_id);
 			if ($template instanceof COTemplate) {
 				try {
 					DB::beginWork();
@@ -455,7 +455,7 @@ class TemplateController extends ApplicationController {
 				}
 			}
 		}
-		tpl_assign('templates', COTemplates::findAll());
+		tpl_assign('templates', COTemplates::instance()->findAll());
 		tpl_assign("object", $object);
 	}
 	
@@ -470,7 +470,7 @@ class TemplateController extends ApplicationController {
 	
 	function get_context(){
 		$id = get_id();
-		$template = COTemplates::findById($id);
+		$template = COTemplates::instance()->findById($id);
 		$this->setTemplate('get_context');
 		if(array_var($_POST, 'members')){
 			$this->instantiate();
@@ -485,7 +485,7 @@ class TemplateController extends ApplicationController {
 		$id = get_id();
 	
 		
-		$template = COTemplates::findById($id);
+		$template = COTemplates::instance()->findById($id);
 		if (!$template instanceof COTemplate) {
 			flash_error(lang("template dnx"));
 			ajx_current("empty");
@@ -511,7 +511,7 @@ class TemplateController extends ApplicationController {
 		$objects = $template->getObjects() ;
 		$controller  = new ObjectController();
 		if (count($selected_members > 0)) {
-			$selected_members_instances = Members::findAll(array('conditions' => 'id IN ('.implode($selected_members).')'));
+			$selected_members_instances = Members::instance()->findAll(array('conditions' => 'id IN ('.implode($selected_members).')'));
 		} else {
 			$selected_members_instances = array();
 		}
@@ -762,7 +762,7 @@ class TemplateController extends ApplicationController {
 			return;
 		}
 		$template_id = get_id();
-		$cotemplate = COTemplates::findById($template_id);
+		$cotemplate = COTemplates::instance()->findById($template_id);
 		if (!$cotemplate instanceof COTemplate) {
 			flash_error(lang("template dnx"));
 			ajx_current("empty");

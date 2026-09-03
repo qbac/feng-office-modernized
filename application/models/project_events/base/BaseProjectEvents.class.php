@@ -58,7 +58,7 @@ abstract class BaseProjectEvents extends ContentDataObjects {
      * @param void
      * @return array
      */
-    function getColumns() {
+    static function getColumns() {
             return array_keys(self::$columns);
     } // getColumns
 
@@ -259,11 +259,11 @@ abstract class BaseProjectEvents extends ContentDataObjects {
 	 * @param integer $current_page Current page number
 	 * @return array
 	 */
-	function paginate($arguments = null, $items_per_page = 10, $current_page = 1) {
+	function paginate($arguments = null, $items_per_page = 10, $current_page = 1, $count = null) {
 		if(isset($this) && instance_of($this, 'ProjectEvents')) {
-			return parent::paginate($arguments, $items_per_page, $current_page);
+			return parent::paginate($arguments, $items_per_page, $current_page, $count);
 		} else {
-			return ProjectEvents::instance()->paginate($arguments, $items_per_page, $current_page);
+			return ProjectEvents::instance()->paginate($arguments, $items_per_page, $current_page, $count);
 		} // if
 	} // paginate
 
@@ -272,7 +272,7 @@ abstract class BaseProjectEvents extends ContentDataObjects {
 	 *
 	 * @return ProjectEvents
 	 */
-	function instance() {
+	static function instance() {
 		static $instance;
 		if(!instance_of($instance, 'ProjectEvents')) {
 			$instance = new ProjectEvents();

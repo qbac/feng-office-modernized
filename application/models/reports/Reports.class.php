@@ -19,7 +19,7 @@ class Reports extends BaseReports {
 	 * @return Report
 	 */
 	static function getReport($id) {
-		return self::findById($id);
+		return self::instance()->findById($id);
 	} //  getReport
 
 	/**
@@ -29,7 +29,7 @@ class Reports extends BaseReports {
 	 * @return array
 	 */
 	static function getAllReportsForObjectType($object_type) {
-		return self::findAll(array(
+		return self::instance()->findAll(array(
 			'conditions' => array("`object_type_id` = ?", $object_type)
 		));
 	} //  getAllReportsForObjectType
@@ -40,7 +40,7 @@ class Reports extends BaseReports {
 	 * @return array
 	 */
 	static function getAllReports() {
-		return self::findAll();
+		return self::instance()->findAll();
 	} //  getAllReports
 
 	/**
@@ -49,7 +49,7 @@ class Reports extends BaseReports {
 	 * @return array
 	 */
 	static function getAllReportsByObjectType() {
-		$ignore_context_reports = Reports::findAll(array("conditions" => "ignore_context = 1"));
+		$ignore_context_reports = Reports::instance()->findAll(array("conditions" => "ignore_context = 1"));
 		
 		$reports_result = Reports::instance()->listing();
 		$reports = $reports_result->objects;
@@ -197,7 +197,7 @@ class Reports extends BaseReports {
 			$conditionsFields = ReportConditions::getAllReportConditionsForFields($id);
 			$conditionsCp = ReportConditions::getAllReportConditionsForCustomProperties($id);
 			
-			$ot = ObjectTypes::findById($report->getReportObjectTypeId());
+			$ot = ObjectTypes::instance()->findById($report->getReportObjectTypeId());
 			$table = $ot->getTableName();
 			
 			eval('$managerInstance = ' . $ot->getHandlerClass() . "::instance();");
@@ -479,7 +479,7 @@ class Reports extends BaseReports {
 									$value = $object->getColumnValue($field);
 									// if it is a task column
 									if (in_array($field, ProjectTasks::instance()->getColumns())) {
-										$task = ProjectTasks::findById($object->getRelObjectId());
+										$task = ProjectTasks::instance()->findById($object->getRelObjectId());
 										// if task exists
 										if ($task instanceof ProjectTask) {
 											$value = $task->getColumnValue($field);
@@ -537,7 +537,7 @@ class Reports extends BaseReports {
 							
 							if($ot->getHandlerClass() == 'Contacts'){
 								if($managerInstance instanceof Contacts){
-									$contact = Contacts::findOne(array("conditions" => "object_id = ".$object->getId()));
+									$contact = Contacts::instance()->findOne(array("conditions" => "object_id = ".$object->getId()));
 									if ($field == "email_address"){
 										$row_values[$field] = $contact->getEmailAddress();
 									}
@@ -576,7 +576,7 @@ class Reports extends BaseReports {
 						if ($cp instanceof CustomProperty) { /* @var $cp CustomProperty */
 							$cp_val = CustomPropertyValues::getCustomPropertyValue($object instanceof Timeslot ? $object->getRelObjectId() : $object->getId(), $colCp);
 							if ($cp->getType() == 'contact' && $cp_val instanceof CustomPropertyValue) {
-								$cp_contact = Contacts::findById($cp_val->getValue());
+								$cp_contact = Contacts::instance()->findById($cp_val->getValue());
 								$cp_val->setValue($cp_contact->getObjectName());
 							}
 							$row_values[$cp->getName()] = $cp_val instanceof CustomPropertyValue ? $cp_val->getValue() : "";
@@ -684,13 +684,13 @@ class Reports extends BaseReports {
 	function getExternalColumnValue($field, $id, $manager = null){
 		$value = '';
 		if($field == 'user_id' || $field == 'contact_id' || $field == 'created_by_id' || $field == 'updated_by_id' || $field == 'assigned_to_contact_id' || $field == 'assigned_by_id' || $field == 'completed_by_id'|| $field == 'approved_by_id'){
-			$contact = Contacts::findById($id);
+			$contact = Contacts::instance()->findById($id);
 			if($contact instanceof Contact) $value = $contact->getObjectName();
 		} else if($field == 'milestone_id'){
-			$milestone = ProjectMilestones::findById($id);
+			$milestone = ProjectMilestones::instance()->findById($id);
 			if($milestone instanceof ProjectMilestone) $value = $milestone->getObjectName();
 		} else if($field == 'company_id'){
-			$company = Contacts::findById($id);
+			$company = Contacts::instance()->findById($id);
 			if($company instanceof Contact && $company->getIsCompany()) $value = $company->getObjectName();
 		} else if($field == 'rel_object_id'){
 			$value = $id;

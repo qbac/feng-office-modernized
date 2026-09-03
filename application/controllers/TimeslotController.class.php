@@ -104,9 +104,9 @@ class TimeslotController extends ApplicationController {
 			$timeslot->setContactId(array_var($timeslot_data, 'contact_id', logged_user()->getId()));
 			$timeslot->setRelObjectId($object_id);
 			
-			$user = Contacts::findById(array_var($timeslot_data, 'contact_id', logged_user()->getId()));
+			$user = Contacts::instance()->findById(array_var($timeslot_data, 'contact_id', logged_user()->getId()));
 			$billing_category_id = $user->getDefaultBillingId();
-			$bc = BillingCategories::findById($billing_category_id);
+			$bc = BillingCategories::instance()->findById($billing_category_id);
 			if ($bc instanceof BillingCategory) {
 				$timeslot->setBillingId($billing_category_id);
 				$hourly_billing = $bc->getDefaultValue();
@@ -125,7 +125,7 @@ class TimeslotController extends ApplicationController {
 				*/
 				
 
-				$task = ProjectTasks::findById($object_id);
+				$task = ProjectTasks::instance()->findById($object_id);
 				if($task instanceof ProjectTask) {
 					$task->calculatePercentComplete();	
 				}
@@ -157,7 +157,7 @@ class TimeslotController extends ApplicationController {
 
 		$this->setTemplate('add_timeslot');
 
-		$timeslot = Timeslots::findById(get_id());
+		$timeslot = Timeslots::instance()->findById(get_id());
 		if(!($timeslot instanceof Timeslot)) {
 			flash_error(lang('timeslot dnx'));
 			ajx_current("empty");
@@ -222,7 +222,7 @@ class TimeslotController extends ApplicationController {
 
 		ajx_current("empty");
 
-		$timeslot = Timeslots::findById(get_id());
+		$timeslot = Timeslots::instance()->findById(get_id());
 		if(!($timeslot instanceof Timeslot)) {
 			flash_error(lang('timeslot dnx'));
 			return;
@@ -262,7 +262,7 @@ class TimeslotController extends ApplicationController {
 
 		ajx_current("empty");
 
-		$timeslot = Timeslots::findById(get_id());
+		$timeslot = Timeslots::instance()->findById(get_id());
 		if(!($timeslot instanceof Timeslot)) {
 			flash_error(lang('timeslot dnx'));
 			return;
@@ -308,7 +308,7 @@ class TimeslotController extends ApplicationController {
 
 		$this->setTemplate('add_timeslot');
 		
-		$timeslot = Timeslots::findById(get_id());
+		$timeslot = Timeslots::instance()->findById(get_id());
 		if(!($timeslot instanceof Timeslot)) {
 			flash_error(lang('timeslot dnx'));
 			ajx_current("empty");
@@ -350,7 +350,7 @@ class TimeslotController extends ApplicationController {
 		tpl_assign('timeslot_form_object', $object);
 		tpl_assign('timeslot', $timeslot);
 		tpl_assign('timeslot_data', $timeslot_data);
-		tpl_assign('show_billing', BillingCategories::count() > 0);
+		tpl_assign('show_billing', BillingCategories::instance()->count() > 0);
 		
 		if(is_array(array_var($_POST, 'timeslot'))) {
 			try {
@@ -416,7 +416,7 @@ class TimeslotController extends ApplicationController {
 				DB::beginWork();
 				$timeslot->save();
 				
-				$task = ProjectTasks::findById($timeslot->getRelObjectId());
+				$task = ProjectTasks::instance()->findById($timeslot->getRelObjectId());
 				if($task instanceof ProjectTask) {
 					$task->calculatePercentComplete();
 				}
@@ -444,7 +444,7 @@ class TimeslotController extends ApplicationController {
 	 */
 	function delete() {
 
-		$timeslot = Timeslots::findById(get_id());
+		$timeslot = Timeslots::instance()->findById(get_id());
 		if(!($timeslot instanceof Timeslot)) {
 			flash_error(lang('timeslot dnx'));
 			ajx_current("empty");

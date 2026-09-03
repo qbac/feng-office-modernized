@@ -72,7 +72,10 @@ final class DB {
 	} // connect
 
 	static function close() {
-		self::connection()->close();
+		$connection = self::connection();
+		if ($connection instanceof AbstractDBAdapter) {
+			$connection->close();
+		}
 	}
 
 	/**
@@ -85,7 +88,7 @@ final class DB {
 	 * @throws DBAdapterDnx
 	 * @throws DBConnectError
 	 */
-	private function connectAdapter($adapter_name, $params) {
+	static private function connectAdapter($adapter_name, $params) {
 
 		self::useAdapter($adapter_name);
 
@@ -105,7 +108,7 @@ final class DB {
 	 * @param string $adapter_class
 	 * @return void
 	 */
-	private function useAdapter($adapter_name) {
+	static private function useAdapter($adapter_name) {
 		$adapter_class = self::getAdapterClass($adapter_name);
 		$path = dirname(__FILE__) . "/adapters/$adapter_class.class.php";
 		if(!is_readable($path)) throw new FileDnxError($path);
@@ -119,7 +122,7 @@ final class DB {
 	 * @param string $adapter_name
 	 * @return string
 	 */
-	private function getAdapterClass($adapter_name) {
+	static private function getAdapterClass($adapter_name) {
 		return Inflector::camelize($adapter_name) . 'DBAdapter';
 	} // getAdapterClass
 

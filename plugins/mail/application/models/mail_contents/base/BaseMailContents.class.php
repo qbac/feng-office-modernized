@@ -57,7 +57,7 @@ abstract class BaseMailContents extends ContentDataObjects {
 	 * @param void
 	 * @return array
 	 */
-	function getColumns() {
+	static function getColumns() {
 		return array_keys(self::$columns);
 	}
 
@@ -267,7 +267,7 @@ abstract class BaseMailContents extends ContentDataObjects {
 	 *
 	 * @return MailContents
 	 */
-	function instance() {
+	static function instance() {
 		static $instance;
 		if(!instance_of($instance, 'MailContents')) {
 			$instance = new MailContents();

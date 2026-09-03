@@ -27,7 +27,7 @@
     * @return array
     */
   	function getMailAccountsByUser(Contact $user){	
-  		//return MailAccounts::findAll(array("conditions"=>"contact_id = ".logged_user()->getId()));
+  		//return MailAccounts::instance()->findAll(array("conditions"=>"contact_id = ".logged_user()->getId()));
   		
   		$accounts = array();
   		$accountUsers = MailAccountContacts::getByContact($user);
@@ -41,7 +41,7 @@
   	}
         
         function getMailAccountsEditByUser(Contact $user){	
-  		//return MailAccounts::findAll(array("conditions"=>"contact_id = ".logged_user()->getId()));
+  		//return MailAccounts::instance()->findAll(array("conditions"=>"contact_id = ".logged_user()->getId()));
   		
   		$accounts = array();
   		$accountUsers = MailAccountContacts::getByContact($user);

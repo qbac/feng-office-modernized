@@ -15,7 +15,7 @@
     */
   	function getMailAccountImapFolders($accountid)
   	{
-  		return MailAccountImapFolders::findAll(array(
+  		return MailAccountImapFolders::instance()->findAll(array(
         'conditions' => '`account_id` = ' . $accountid
       )); // findAll
   	}

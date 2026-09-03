@@ -227,7 +227,7 @@ if(count($cps) > 0){
 					$cp_value = CustomPropertyValues::getCustomPropertyValue($_custom_properties_object->getId(), $customProp->getId());
 					if ($cp_value instanceof CustomPropertyValue && is_numeric($cp_value->getValue())) {
 						$value = $cp_value->getValue();
-						$contact = Contacts::findById($value);
+						$contact = Contacts::instance()->findById($value);
 					}
 					
 					Hook::fire('object_contact_cp_filters', array('cp' => $customProp, 'object' => $_custom_properties_object), $filters);

@@ -11,7 +11,7 @@ class Billing extends BaseBilling {
 	
 	function getBillingCategory(){
 		if(is_null($this->billing_category)) {
-			$this->billing_category = BillingCategories::findById($this->getBillingId());
+			$this->billing_category = BillingCategories::instance()->findById($this->getBillingId());
 		} // if
 		return $this->billing_category;
 	}

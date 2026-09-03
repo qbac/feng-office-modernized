@@ -46,7 +46,7 @@ class MilestoneController extends ApplicationController {
 	function view() {
 		$this->addHelper('textile');
 
-		$milestone = ProjectMilestones::findById(get_id());
+		$milestone = ProjectMilestones::instance()->findById(get_id());
 		if(!($milestone instanceof ProjectMilestone)) {
 			flash_error(lang('milestone dnx'));
 			ajx_current("empty");
@@ -141,7 +141,7 @@ class MilestoneController extends ApplicationController {
 
 				if (array_var($_GET, 'copyId', 0) > 0) {
 					// copy remaining stuff from the milestone with id copyId
-					$toCopy = ProjectMilestones::findById(array_var($_GET, 'copyId'));
+					$toCopy = ProjectMilestones::instance()->findById(array_var($_GET, 'copyId'));
 					if ($toCopy instanceof ProjectMilestone) {
 						ProjectMilestones::copyTasks($toCopy, $milestone, array_var($milestone_data, 'is_template', false));
 					}
@@ -205,7 +205,7 @@ class MilestoneController extends ApplicationController {
 		$this->setTemplate('add_milestone');
 		
 		if(array_var($_REQUEST, "template_milestone")){
-			$milestone = TemplateMilestones::findById(get_id());
+			$milestone = TemplateMilestones::instance()->findById(get_id());
 			$this->setTemplate(get_template_path('add_template_milestone', 'template_milestone'));
 			if(!($milestone instanceof TemplateMilestone)) {
 				flash_error(lang('milestone dnx'));
@@ -213,7 +213,7 @@ class MilestoneController extends ApplicationController {
 				return;
 			} // if
 		}else{
-			$milestone = ProjectMilestones::findById(get_id());
+			$milestone = ProjectMilestones::instance()->findById(get_id());
 			if(!($milestone instanceof ProjectMilestone)) {
 				flash_error(lang('milestone dnx'));
 				ajx_current("empty");
@@ -307,7 +307,7 @@ class MilestoneController extends ApplicationController {
 			return;
 		}
 		ajx_current("empty");
-		$milestone = ProjectMilestones::findById(get_id());
+		$milestone = ProjectMilestones::instance()->findById(get_id());
 		if(!($milestone instanceof ProjectMilestone)) {
 			flash_error(lang('milestone dnx'));
 			return;
@@ -354,7 +354,7 @@ class MilestoneController extends ApplicationController {
 			return;
 		}
 		ajx_current("empty");
-		$milestone = ProjectMilestones::findById(get_id());
+		$milestone = ProjectMilestones::instance()->findById(get_id());
 		if(!($milestone instanceof ProjectMilestone)) {
 			flash_error(lang('milestone dnx'));
 			return;
@@ -403,7 +403,7 @@ class MilestoneController extends ApplicationController {
 			return;
 		}
 		ajx_current("empty");
-		$milestone = ProjectMilestones::findById(get_id());
+		$milestone = ProjectMilestones::instance()->findById(get_id());
 		if(!($milestone instanceof ProjectMilestone)) {
 			flash_error(lang('milestone dnx'));
 			return;
@@ -461,7 +461,7 @@ class MilestoneController extends ApplicationController {
 		} // if
 		
 		$id = get_id();
-		$milestone = ProjectMilestones::findById($id);
+		$milestone = ProjectMilestones::instance()->findById($id);
 		if (!$milestone instanceof ProjectMilestone) {
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -504,7 +504,7 @@ class MilestoneController extends ApplicationController {
 		} // if
 		
 		$id = get_id();
-		$milestone = ProjectMilestones::findById($id);
+		$milestone = ProjectMilestones::instance()->findById($id);
 		if (!$milestone instanceof ProjectMilestone) {
 			$milestone_data = array('is_template' => true);
 		} else {
@@ -526,7 +526,7 @@ class MilestoneController extends ApplicationController {
 	} // new_template
 	
 	function change_due_date() {
-		$milestone = ProjectMilestones::findById(get_id());
+		$milestone = ProjectMilestones::instance()->findById(get_id());
 		if(!$milestone->canEdit(logged_user())){	    	
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -565,7 +565,7 @@ class MilestoneController extends ApplicationController {
 	 */
 	function get_assignable_milestones() {
 		ajx_current("empty");
-		$ms = ProjectMilestones::findAll();
+		$ms = ProjectMilestones::instance()->findAll();
 		if ($ms === null) $ms = array();
 		$ms_info = array();
 		foreach ($ms as $milestone) {

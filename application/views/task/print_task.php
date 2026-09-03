@@ -64,7 +64,7 @@ border-bottom:1px solid black;
 						$dim = $member->getDimension();
 						if($dim->getIsManageable()){
 							if ($dim->getCode() == "customer_project"){
-								$obj_type = ObjectTypes::findById($member->getObjectTypeId());
+								$obj_type = ObjectTypes::instance()->findById($member->getObjectTypeId());
 								if ($obj_type instanceof ObjectType) {
 								echo lang($dim->getCode()). ": ";
 								echo $contexts[$dim->getCode()][$obj_type->getName()][]= '<span style="'.get_workspace_css_properties($member->getMemberColor()).'">'. $member->getName() .'</span>';

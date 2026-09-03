@@ -238,7 +238,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	var $created_by = null;
 	function getCreatedBy() {
 		if(is_null($this->created_by)) {
-			if($this->object->columnExists('created_by_id')) $this->created_by = Contacts::findById($this->getCreatedById());
+			if($this->object->columnExists('created_by_id')) $this->created_by = Contacts::instance()->findById($this->getCreatedById());
 		} //
 		return $this->created_by;
 	} // getCreatedBy
@@ -266,7 +266,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	var $updated_by = null;
 	function getUpdatedBy() {
 		if(is_null($this->updated_by)) {
-			if($this->object->columnExists('updated_by_id')) $this->updated_by = Contacts::findById($this->getUpdatedById());
+			if($this->object->columnExists('updated_by_id')) $this->updated_by = Contacts::instance()->findById($this->getUpdatedById());
 		} //
 		return $this->updated_by;
 	} // getUpdatedBy
@@ -331,7 +331,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	var $trashed_by = null;
 	function getTrashedBy() {
 		if(is_null($this->trashed_by)) {
-			if($this->object->columnExists('trashed_by_id')) $this->trashed_by = Contacts::findById($this->getTrashedById());
+			if($this->object->columnExists('trashed_by_id')) $this->trashed_by = Contacts::instance()->findById($this->getTrashedById());
 		} //
 		return $this->trashed_by;
 	} // getTrashedBy	
@@ -571,7 +571,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	function copy_custom_properties($object_from) {
 		if (!$object_from instanceof ContentDataObject) return;
 		
-		$cp_values = CustomPropertyValues::findAll(array('conditions' => 'object_id = '.$object_from->getId()));
+		$cp_values = CustomPropertyValues::instance()->findAll(array('conditions' => 'object_id = '.$object_from->getId()));
 		foreach ($cp_values as $cp_value) {
 			$new_cp_value = new CustomPropertyValue();
 			$new_cp_value->setObjectId($this->getId());
@@ -913,7 +913,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	 */
 	function isSubscriber(Contact $user) {
 		if ($this->isNew()) return false;
-		$subscription = ObjectSubscriptions::findById(array(
+		$subscription = ObjectSubscriptions::instance()->findById(array(
         	'object_id' => $this->getId(),
         	'contact_id' => $user->getId()
 		)); // findById
@@ -952,7 +952,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	 * @return boolean
 	 */
 	function unsubscribeUser(Contact $user) {
-		$subscription = ObjectSubscriptions::findById(array(
+		$subscription = ObjectSubscriptions::instance()->findById(array(
         'object_id' => $this->getId(),
         'contact_id' => $user->getId()
 		)); // findById
@@ -1098,7 +1098,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 			DB::execute("INSERT INTO ".TABLE_PREFIX."read_objects (rel_object_id, contact_id, is_read, created_on) VALUES (?, ?, 1, ?) ON DUPLICATE KEY UPDATE is_read=1", $this->getId(), $contact_id, $now);
 			$this->is_read[$contact_id] = true;
 		} else {
-			ReadObjects::delete('rel_object_id = ' . $this->getId() . ' AND contact_id = ' . $contact_id);
+			ReadObjects::instance()->delete('rel_object_id = ' . $this->getId() . ' AND contact_id = ' . $contact_id);
 		}
 		
 		return true;
@@ -1114,7 +1114,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 		if (logged_user() instanceof Contact) {
 			$conditions .= " AND `contact_id` <> " . logged_user()->getId();
 		}
-		ReadObjects::delete($conditions);
+		ReadObjects::instance()->delete($conditions);
 	}
 	
 	
@@ -1165,17 +1165,17 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	
 	
 	function clearMembers() {
-		return ObjectMembers::delete(array("`object_id` = ?", $this->getId()));
+		return ObjectMembers::instance()->delete(array("`object_id` = ?", $this->getId()));
 	}
 
 	function clearSharingTable() {
-		return SharingTables::delete("`object_id` = ".$this->getId());
+		return SharingTables::instance()->delete("`object_id` = ".$this->getId());
 		
 	}
 	
 
 	function clearReads() {
-		return ReadObjects::delete(array("`rel_object_id` = ?", $this->getId()));
+		return ReadObjects::instance()->delete(array("`rel_object_id` = ?", $this->getId()));
 	}
 	
 	
@@ -1311,7 +1311,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	function addToMembers($members_array, $remove_old_comment_members = false){
 		ObjectMembers::addObjectToMembers($this->getId(),$members_array);
 		if ($this instanceof ProjectFile) {
-			$inline_images = ProjectFiles::findAll(array("conditions" => "mail_id = ".$this->getId()));
+			$inline_images = ProjectFiles::instance()->findAll(array("conditions" => "mail_id = ".$this->getId()));
 			foreach ($inline_images as $inline_img) {
 				$inline_img->addToMembers($members_array);
 				$inline_img->addToSharingTable();
@@ -1341,7 +1341,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 		$table_prefix = defined('FORCED_TABLE_PREFIX') && FORCED_TABLE_PREFIX ? FORCED_TABLE_PREFIX : TABLE_PREFIX;
 		
 		//1. clear sharing table for this object
-		SharingTables::delete("object_id=$oid");
+		SharingTables::instance()->delete("object_id=$oid");
 		
 		//2. get dimensions of this object's members that defines permissions
 		$res = DB::execute("SELECT d.id as did FROM ".$table_prefix."dimensions d INNER JOIN ".$table_prefix."members m on m.dimension_id=d.id
@@ -1403,7 +1403,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 			$gids_tmp = null;
 			
 			// check for mandatory dimensions
-			$mandatory_dim_ids = Dimensions::findAll(array('id' => true, 'conditions' => "`defines_permissions`=1 AND `permission_query_method`='".DIMENSION_PERMISSION_QUERY_METHOD_MANDATORY."'"));
+			$mandatory_dim_ids = Dimensions::instance()->findAll(array('id' => true, 'conditions' => "`defines_permissions`=1 AND `permission_query_method`='".DIMENSION_PERMISSION_QUERY_METHOD_MANDATORY."'"));
 			if (count($gids) > 0 && count($mandatory_dim_ids) > 0) {
 				$sql = "SELECT om.member_id, m.dimension_id FROM ".$table_prefix."object_members om 
 				INNER JOIN ".$table_prefix."members m ON m.id=om.member_id INNER JOIN ".$table_prefix."dimensions d ON d.id=m.dimension_id 
@@ -1570,13 +1570,13 @@ abstract class ContentDataObject extends ApplicationDataObject {
 		if ($user)
 			$userCondition = ' AND `contact_id` = '. $user->getId();
 
-		return Timeslots::findOne(array(
+		return Timeslots::instance()->findOne(array(
           'conditions' => array('`rel_object_id` = ? AND end_time = \'' . EMPTY_DATETIME . '\''  . $userCondition, $this->getObjectId()))
 		) instanceof Timeslot;
 	}
 
 	function closeTimeslots(Contact $user, $description = ''){
-		$timeslots = Timeslots::findAll(array('conditions' => 'contact_id = ' . $user->getId() . ' AND rel_object_id = ' . $this->getObjectId() . ' AND end_time = "' . EMPTY_DATETIME . '"'));
+		$timeslots = Timeslots::instance()->findAll(array('conditions' => 'contact_id = ' . $user->getId() . ' AND rel_object_id = ' . $this->getObjectId() . ' AND end_time = "' . EMPTY_DATETIME . '"'));
 
 		foreach($timeslots as $timeslot){
 			$timeslot->close($description);
@@ -1587,7 +1587,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	}
 
 	function pauseTimeslots(Contact $user){
-		$timeslots = Timeslots::findAll(array('conditions' => 'contact_id = ' . $user->getId() . ' AND rel_object_id = ' . $this->getObjectId() . ' AND end_time = "' . EMPTY_DATETIME . '" AND paused_on = "' . EMPTY_DATETIME . '"'));
+		$timeslots = Timeslots::instance()->findAll(array('conditions' => 'contact_id = ' . $user->getId() . ' AND rel_object_id = ' . $this->getObjectId() . ' AND end_time = "' . EMPTY_DATETIME . '" AND paused_on = "' . EMPTY_DATETIME . '"'));
 
 		if ($timeslots) {
 			foreach($timeslots as $timeslot){
@@ -1598,7 +1598,7 @@ abstract class ContentDataObject extends ApplicationDataObject {
 	}
 
 	function resumeTimeslots(Contact $user){
-		$timeslots = Timeslots::findAll(array('conditions' => 'contact_id = ' . $user->getId() . ' AND rel_object_id = ' . $this->getObjectId() . ' AND end_time = "' . EMPTY_DATETIME . '" AND paused_on != "' . EMPTY_DATETIME . '"'));
+		$timeslots = Timeslots::instance()->findAll(array('conditions' => 'contact_id = ' . $user->getId() . ' AND rel_object_id = ' . $this->getObjectId() . ' AND end_time = "' . EMPTY_DATETIME . '" AND paused_on != "' . EMPTY_DATETIME . '"'));
 
 		if ($timeslots)
 		foreach($timeslots as $timeslot){

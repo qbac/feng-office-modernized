@@ -35,7 +35,7 @@ class ProjectEvent extends BaseProjectEvent {
 	} // __construct
 
 	function getUserName(){
-		$user = Contacts::findById($this->getCreatedById());
+		$user = Contacts::instance()->findById($this->getCreatedById());
 		if ($user instanceof Contact ) return $user->getUsername();
 		else return null;
 	}
@@ -259,7 +259,7 @@ class ProjectEvent extends BaseProjectEvent {
 	
 	function clearInvitations() {
 		$this->event_invitations = array();
-		EventInvitations::delete(array ('`event_id` = ?', $this->getId()));
+		EventInvitations::instance()->delete(array ('`event_id` = ?', $this->getId()));
 	}
 	
 	

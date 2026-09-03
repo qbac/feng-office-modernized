@@ -80,7 +80,7 @@ class ProjectFile extends BaseProjectFile {
 		
 		if(!isset($conditions)) $conditions = DB::prepareString("`file_id` = ? AND `trashed_on` = '0000-00-00 00:00:00'", array($this->getId()));
 		
-		return ProjectFileRevisions::find(array(
+		return ProjectFileRevisions::instance()->find(array(
 	        'conditions' => $conditions,
 	        'order' => '`created_on` ' . $dir
         )); // find
@@ -93,7 +93,7 @@ class ProjectFile extends BaseProjectFile {
 	 * @return integer
 	 */
 	function countRevisions() {
-		return ProjectFileRevisions::count(array(
+		return ProjectFileRevisions::instance()->count(array(
         '`file_id` = ?', $this->getId()
 		)); // count
 	} // countRevisions
@@ -118,7 +118,7 @@ class ProjectFile extends BaseProjectFile {
 	function getLastRevision() {
 		if(is_null($this->last_revision)) {
 
-			$this->last_revision = ProjectFileRevisions::findOne(array(
+			$this->last_revision = ProjectFileRevisions::instance()->findOne(array(
           'conditions' => array('`file_id` = ?', $this->getId()),
 		  'order' => '`created_on` DESC',
           'limit' => 1,
@@ -217,7 +217,7 @@ class ProjectFile extends BaseProjectFile {
 	 */
 	function getCheckedOutBy() {
 		if(is_null($this->checked_out_by)) {
-			if($this->columnExists('checked_out_by_id')) $this->checked_out_by = Contacts::findById($this->getCheckedOutById());
+			if($this->columnExists('checked_out_by_id')) $this->checked_out_by = Contacts::instance()->findById($this->getCheckedOutById());
 		} //
 		return $this->checked_out_by;
 	} // getCreatedBy
@@ -864,13 +864,13 @@ class ProjectFile extends BaseProjectFile {
 			parent::addToSharingTable();
 		} else {
 			// if not classified and belongs to an email
-			$mail = MailContents::findById($this->getMailId());
+			$mail = MailContents::instance()->findById($this->getMailId());
 			if ($mail instanceof MailContent) {
 				DB::execute("DELETE FROM ".TABLE_PREFIX."sharing_table WHERE object_id=".$this->getId());
 				
-				$macs = MailAccountContacts::findAll(array('conditions' => array('`account_id` = ?', $mail->getAccountId())));
+				$macs = MailAccountContacts::instance()->findAll(array('conditions' => array('`account_id` = ?', $mail->getAccountId())));
 				foreach ($macs as $mac) {
-					$c = Contacts::findById($mac->getContactId());
+					$c = Contacts::instance()->findById($mac->getContactId());
 					if ($c instanceof Contact) {
 						$values = "(".$c->getPermissionGroupId().",".$this->getId().")";
 						DB::execute("INSERT INTO ".TABLE_PREFIX."sharing_table (group_id, object_id) VALUES $values;");

@@ -17,7 +17,7 @@
 			$ret = null;
 			Hook::fire("render_widget_member_information", $member, $ret);
 
-			$ot = ObjectTypes::findById($member->getObjectTypeId());
+			$ot = ObjectTypes::instance()->findById($member->getObjectTypeId());
 			if ($ot->getName()=='project_folder' || $ot->getName()=='customer_folder') {
 				$ot = ObjectTypes::findByName('folder');
 			}

@@ -274,14 +274,14 @@ class AdministrationController extends ApplicationController {
 						$applyto = array_var($data, 'applyto');
 						foreach ($applyto as $co_type => $value) {
 							if ($value == 'true') {
-								if (!CustomPropertiesByCoType::findById(array('co_type_id' => $co_type, 'cp_id' => $new_cp->getId()))) {
+								if (!CustomPropertiesByCoType::instance()->findById(array('co_type_id' => $co_type, 'cp_id' => $new_cp->getId()))) {
 									$obj = new CustomPropertyByCoType();
 									$obj->setCoTypeId($co_type);
 									$obj->setCpId($new_cp->getId());
 									$obj->save();
 								}
 							} else {
-								$obj = CustomPropertiesByCoType::findById(array('co_type_id' => $co_type, 'cp_id' => $new_cp->getId()));
+								$obj = CustomPropertiesByCoType::instance()->findById(array('co_type_id' => $co_type, 'cp_id' => $new_cp->getId()));
 								if ($obj) $obj->delete();
 							}
 						}
@@ -313,7 +313,7 @@ class AdministrationController extends ApplicationController {
 		$groups = PermissionGroups::getNonRolePermissionGroups();
 		$gr_lengths = array();
 		foreach ($groups as $gr) {
-			$count = ContactPermissionGroups::count("`permission_group_id` = ".$gr->getId());
+			$count = ContactPermissionGroups::instance()->count("`permission_group_id` = ".$gr->getId());
 			$gr_lengths[$gr->getId()] = $count;
 		}
 		tpl_assign('gr_lengths', $gr_lengths);
@@ -611,7 +611,7 @@ class AdministrationController extends ApplicationController {
 			try {
 				DB::beginWork();
 				foreach ($cron_events as $id => $data) {
-					$event = CronEvents::findById($id);
+					$event = CronEvents::instance()->findById($id);
 					$date = getDateValue($data['date']);
 					if ($date instanceof DateTimeValue) {
 						$this->parseTime($data['time'], $hour, $minute);
@@ -670,7 +670,7 @@ class AdministrationController extends ApplicationController {
 		}
 		if (Plugins::instance()->isActivePlugin('mail')) {
 			//$my_accounts = MailAccounts::getMailAccountsByUser(logged_user());
-			$all_accounts = MailAccounts::findAll();
+			$all_accounts = MailAccounts::instance()->findAll();
 		}
 		//tpl_assign('my_accounts', $my_accounts);
 		tpl_assign('all_accounts', $all_accounts);
@@ -699,7 +699,7 @@ class AdministrationController extends ApplicationController {
 				DB::beginWork();
 				foreach ($object_subtypes as $manager => $subtypes) {
 					foreach ($subtypes as $subtype) {
-						$type = ProjectCoTypes::findById(array_var($subtype, 'id', 0));
+						$type = ProjectCoTypes::instance()->findById(array_var($subtype, 'id', 0));
 						if (!$type instanceof ProjectCoType) {
 							$type = new ProjectCoType();
 							$type->setObjectManager($manager);
@@ -752,7 +752,7 @@ class AdministrationController extends ApplicationController {
 			return;
 		} // if
 		
-		$dimensions = Dimensions::findAll(array('conditions' => '`is_manageable` = 1'));
+		$dimensions = Dimensions::instance()->findAll(array('conditions' => '`is_manageable` = 1'));
 		$members = array();
 		
 		$logged_user_pgs = implode(',', logged_user()->getPermissionGroupIds());
@@ -762,7 +762,7 @@ class AdministrationController extends ApplicationController {
 			
 			$allows_all = $dim->hasAllowAllForContact($logged_user_pgs);
 			
-			$root_members = Members::findAll(array('conditions' => array('`dimension_id`=? AND `parent_member_id`=0', $dim->getId()), 'order' => '`name` ASC'));
+			$root_members = Members::instance()->findAll(array('conditions' => array('`dimension_id`=? AND `parent_member_id`=0', $dim->getId()), 'order' => '`name` ASC'));
 			
 			foreach ($root_members as $mem) {
 				if ($dim->getDefinesPermissions() && !$allows_all) {

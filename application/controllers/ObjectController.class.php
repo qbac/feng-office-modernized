@@ -50,7 +50,7 @@ class ObjectController extends ApplicationController {
 				$user_id = substr($key, 5);
 				$subscribers_ids[] = $user_id;
 				if ($checked == "checked" && !in_array($user_id, $object->getSubscriberIds())) {
-					$user = Contacts::findById($user_id);
+					$user = Contacts::instance()->findById($user_id);
 					if ($user instanceof Contact) {
 						$object->subscribeUser($user);
 						$log_info .= ($log_info == "" ? "" : ",") . $user->getId();
@@ -63,7 +63,7 @@ class ObjectController extends ApplicationController {
 			$subscribers_to_remove = array_diff($object->getSubscriberIds(), $subscribers_ids);
 			
 			foreach ($subscribers_to_remove as $subs_remove) {
-				$user = Contacts::findById($subs_remove);
+				$user = Contacts::instance()->findById($subs_remove);
 				if ($user instanceof Contact) {
 					$object->unsubscribeUser($user);
 					$log_info_unsubscribe .= ($log_info_unsubscribe == "" ? "" : ",") . $user->getId();
@@ -209,13 +209,13 @@ class ObjectController extends ApplicationController {
 				$required_dimension_ids[] = $dot->getDimensionId();
 			}
 		}
-		$required_dimensions = Dimensions::findAll(array("conditions" => "id IN (".implode(",",$required_dimension_ids).") OR is_required=1"));
+		$required_dimensions = Dimensions::instance()->findAll(array("conditions" => "id IN (".implode(",",$required_dimension_ids).") OR is_required=1"));
 		
 		// If not entered members
 		/*if (count($member_ids) <= 0){
 			$throw_error = true;
 			if (Plugins::instance()->isActivePlugin('core_dimensions')) {
-				$personal_member = Members::findById($user->getPersonalMemberId());
+				$personal_member = Members::instance()->findById($user->getPersonalMemberId());
 				if ($personal_member instanceof Member) {
 					$member_ids[] = $user->getPersonalMemberId();
 				}
@@ -223,7 +223,7 @@ class ObjectController extends ApplicationController {
 		}*/
 		
 		if (count($member_ids) > 0) {
-			$enteredMembers = Members::findAll(array('conditions' => 'id IN ('.implode(",", $member_ids).')'));
+			$enteredMembers = Members::instance()->findAll(array('conditions' => 'id IN ('.implode(",", $member_ids).')'));
 		} else {
 			$enteredMembers = array();
 		}
@@ -276,7 +276,7 @@ class ObjectController extends ApplicationController {
 				$ts_mids = ObjectMembers::getMemberIdsByObject($timeslot->getId());
 				// if classified then reclassify
 				if (count($ts_mids) > 0) {
-					ObjectMembers::delete('`object_id` = ' . $timeslot->getId());
+					ObjectMembers::instance()->delete('`object_id` = ' . $timeslot->getId());
 					if (count($validMembers) > 0) {
 						$timeslot->addToMembers($validMembers);
 						$timeslot->addToSharingTable();
@@ -418,7 +418,7 @@ class ObjectController extends ApplicationController {
 						($custom_property->getType() == 'text' || $custom_property->getType() == 'list' || $custom_property->getType() == 'numeric')){
 						
 						$name = $custom_property->getName();
-						$searchable_object = SearchableObjects::findOne(array("conditions" => "`rel_object_id` = ".$object->getId()." AND `column_name` = '$name'"));
+						$searchable_object = SearchableObjects::instance()->findOne(array("conditions" => "`rel_object_id` = ".$object->getId()." AND `column_name` = '$name'"));
 						if (!$searchable_object)
 							$searchable_object = new SearchableObject();
 						
@@ -703,13 +703,13 @@ class ObjectController extends ApplicationController {
 					return;
 				} // if
 					
-				$linked_object = LinkedObjects::findById(array(
+				$linked_object = LinkedObjects::instance()->findById(array(
 					'rel_object_id' => $object_id,
 					'object_id' => $rel_object_id,
 				)); // findById
 				if(!($linked_object instanceof LinkedObject ))
 				{ //search for reverse link
-					$linked_object = LinkedObjects::findById(array(
+					$linked_object = LinkedObjects::instance()->findById(array(
 						'rel_object_id' => $rel_object_id,
 						'object_id' => $object_id,
 					)); // findById
@@ -1034,7 +1034,7 @@ class ObjectController extends ApplicationController {
 					$split = explode(":", $id);
 					$type = $split[0];
 					if (Plugins::instance()->isActivePlugin('mail') && $type == 'MailContents') {
-						$email = MailContents::findById($split[1]);
+						$email = MailContents::instance()->findById($split[1]);
 						if (isset($email) && !$email->isDeleted() && $email->canEdit(logged_user())){
 							if (MailController::do_unclassify($email)) $succ++;
 							else $err++;
@@ -1058,7 +1058,7 @@ class ObjectController extends ApplicationController {
 							$obj->untrash($errorMessage);
 
 							if($obj->getObjectTypeId() == 11){
-								$event = ProjectEvents::findById($obj->getId());
+								$event = ProjectEvents::instance()->findById($obj->getId());
 								if($event->getExtCalId() != ""){
 									$this->created_event_google_calendar($obj,$event);
 								}
@@ -1096,7 +1096,7 @@ class ObjectController extends ApplicationController {
 			if(isset($extra_list_params->template_id)){
 				$template_id = $extra_list_params->template_id;
 			}					
-			$tmpl_task = TemplateTasks::findById(intval($id_no_select));
+			$tmpl_task = TemplateTasks::instance()->findById(intval($id_no_select));
 			if($tmpl_task instanceof TemplateTask){
 				$template_extra_condition = "o.id IN (SELECT object_id from ".TABLE_PREFIX."template_tasks WHERE `template_id` IN (".$tmpl_task->getTemplateId().", 0) )";
 			}else{
@@ -1260,7 +1260,7 @@ class ObjectController extends ApplicationController {
 							$obj->delete(false);
 						} else {
 							$obj->delete();
-							Members::delete(array("conditions"=>"object_id = ".$obj->getId()));
+							Members::instance()->delete(array("conditions"=>"object_id = ".$obj->getId()));
 						}
 						$deleted_object_ids[] = $obj->getId();
 						ApplicationLogs::createLog($obj, ApplicationLogs::ACTION_DELETE);
@@ -1838,7 +1838,7 @@ class ObjectController extends ApplicationController {
 		
 		// popup reminders already checked for logged user
 		if (GlobalCache::isAvailable()) {
-			$today_next_reminders = ObjectReminders::findAll(array(
+			$today_next_reminders = ObjectReminders::instance()->findAll(array(
 				'conditions' => array("`date` > ? AND `date` < ?", DateTimeValueLib::now(), DateTimeValueLib::now()->endOfDay()),
 				'limit' => config_option('cron reminder limit', 100)
 			));
@@ -1885,7 +1885,7 @@ class ObjectController extends ApplicationController {
 	function get_co_types() {
 		$object_type = array_var($_GET, 'object_type', '');
 		if($object_type != ''){
-			$types = ProjectCoTypes::findAll(array("conditions" => "`object_manager` = ".DB::escape($object_type)));
+			$types = ProjectCoTypes::instance()->findAll(array("conditions" => "`object_manager` = ".DB::escape($object_type)));
 			$co_types = array();
 			foreach($types as $type){
 				$t = array();
@@ -1940,7 +1940,7 @@ class ObjectController extends ApplicationController {
             Zend_Loader::loadClass('Zend_Gdata_Calendar');
             
             $users = ExternalCalendarUsers::findByContactId();
-            $calendar = ExternalCalendars::findById($event->getExtCalId());
+            $calendar = ExternalCalendars::instance()->findById($event->getExtCalId());
 
             $user = $users->getAuthUser();
             $pass = $users->getAuthPass();

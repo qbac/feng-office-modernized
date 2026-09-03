@@ -57,7 +57,7 @@ class TaskController extends ApplicationController {
 		$task = new ProjectTask();
 		$task_data = array_var($_POST, 'task');
 		$parent_id = array_var($task_data, 'parent_id', 0);
-		$parent = ProjectTasks::findById($parent_id);
+		$parent = ProjectTasks::instance()->findById($parent_id);
 		
 		if (is_array($task_data)) {
 			$task_data['due_date'] = getDateValue(array_var($task_data, 'task_due_date'));
@@ -180,7 +180,7 @@ class TaskController extends ApplicationController {
 					}
 					Hook::fire('save_subtasks', $task, $subtasks);
 
-					$subtasks = ProjectTasks::findAll(array(
+					$subtasks = ProjectTasks::instance()->findAll(array(
 						'conditions' => '`parent_id` = ' . DB::escape($task->getId())
 					)); // findAll
 					foreach ($subtasks as $sub){
@@ -230,7 +230,7 @@ class TaskController extends ApplicationController {
 			//alert_r($task_data);
 			$task_id = array_var($task_data, 'id');
 			
-			$task = ProjectTasks::findById($task_id);
+			$task = ProjectTasks::instance()->findById($task_id);
 			if(!($task instanceof ProjectTask)) {
 				continue;
 			}
@@ -261,7 +261,7 @@ class TaskController extends ApplicationController {
 		}
 		ajx_current("empty");
 
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 		if(!($task instanceof ProjectTask)) {
 			flash_error(lang('task list dnx'));
 			return;
@@ -528,7 +528,7 @@ class TaskController extends ApplicationController {
 	function get_task_data() {
 		ajx_current("empty");
 		$id = get_id();
-		$task = ProjectTasks::findById($id);
+		$task = ProjectTasks::instance()->findById($id);
 		if ($task instanceof ProjectTask && $task->canView(logged_user())) {
 			$data = array('id' => $id);
 			if (array_var($_REQUEST, 'desc')) {
@@ -569,7 +569,7 @@ class TaskController extends ApplicationController {
 			return;
 		}
 
-		$count_tasks = ProjectTasks::count('object_id in (' . implode(',',$ids) . ')');
+		$count_tasks = ProjectTasks::instance()->count('object_id in (' . implode(',',$ids) . ')');
 		$tasksToReturn = array();
 		$subt_info = array();
 		$showSuccessMessage = true;
@@ -973,7 +973,7 @@ class TaskController extends ApplicationController {
 		if (count($milestone_ids) == 0) $milestone_ids[] = 0;
 		$ext_milestone_conditions = " `is_template` = false " . $pendingstr . ' AND `object_id` IN (' . implode(',',$milestone_ids) . ')';
 
-		$externalMilestones = ProjectMilestones::findAll(array('conditions' => $ext_milestone_conditions));
+		$externalMilestones = ProjectMilestones::instance()->findAll(array('conditions' => $ext_milestone_conditions));
 		
 		// Get Users Info
 		if (logged_user()->isGuest()) {
@@ -989,7 +989,7 @@ class TaskController extends ApplicationController {
 		}
 		
 		// only companies with users
-		$companies = Contacts::findAll(array(
+		$companies = Contacts::instance()->findAll(array(
 			"conditions" => "e.is_company = 1",
 			"join" => array(
 				"table" => Contacts::instance()->getTableName(),
@@ -1007,7 +1007,7 @@ class TaskController extends ApplicationController {
 					$previous = 0;
 					$ptasks = ProjectTaskDependencies::getDependenciesForTask($task['id']);
 					foreach ($ptasks as $pdep) {
-						$ptask = ProjectTasks::findById($pdep->getPreviousTaskId());
+						$ptask = ProjectTasks::instance()->findById($pdep->getPreviousTaskId());
 						if ($ptask instanceof ProjectTask && !$ptask->isCompleted()) $previous++;
 					}
 					$dependants = ProjectTaskDependencies::getDependantsForTask($task['id']);
@@ -1021,7 +1021,7 @@ class TaskController extends ApplicationController {
         
 		if (!$isJson){
 			
-			$all_templates = COTemplates::findAll(array('conditions' => '`trashed_by_id` = 0 AND `archived_by_id` = 0'));
+			$all_templates = COTemplates::instance()->findAll(array('conditions' => '`trashed_by_id` = 0 AND `archived_by_id` = 0'));
 			
 			tpl_assign('all_templates', $all_templates);
 
@@ -1083,7 +1083,7 @@ class TaskController extends ApplicationController {
 	 */
 	function view() {
 		if(array_var($_REQUEST, "template_task")){
-			$task_list = TemplateTasks::findById(get_id());
+			$task_list = TemplateTasks::instance()->findById(get_id());
 			if(!($task_list instanceof TemplateTask)) {
 				flash_error(lang('task list dnx'));
 				ajx_current("empty");
@@ -1091,7 +1091,7 @@ class TaskController extends ApplicationController {
 			} // if
 			$this->setTemplate(get_template_path('view', 'template_task'));
 		}else{
-			$task_list = ProjectTasks::findById(get_id());
+			$task_list = ProjectTasks::instance()->findById(get_id());
 			
 			$this->addHelper('textile');
 			
@@ -1122,7 +1122,7 @@ class TaskController extends ApplicationController {
 
 	function print_task() {
 		$this->setLayout("html");
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 
 		if(!($task instanceof ProjectTask)) {
 			flash_error(lang('task list dnx'));
@@ -1233,7 +1233,7 @@ class TaskController extends ApplicationController {
 			
 			if (Plugins::instance()->isActivePlugin('mail')) {
 				$from_email = array_var($_GET, 'from_email');
-				$email = MailContents::findById($from_email);
+				$email = MailContents::instance()->findById($from_email);
 				if ($email instanceof MailContent) {
 					$task_data['name'] = $email->getSubject();
 					$task_data['text'] = lang('create task from email description', $email->getSubject(), $email->getFrom(), $email->getTextBody());
@@ -1318,7 +1318,7 @@ class TaskController extends ApplicationController {
 				if($task instanceof TemplateTask){
 					//evt_add("template task added", array("id_template_task" => $file->getId()));
 					
-					$parent = TemplateTasks::findById($id);
+					$parent = TemplateTasks::instance()->findById($id);
 					if ($parent instanceof TemplateTask) {
 						$task->setParentId($id);
 						$member_ids = $parent->getMemberIds();						
@@ -1327,7 +1327,7 @@ class TaskController extends ApplicationController {
 					//template id
 					$task->setTemplateId($template_id);
 				}else{
-					$parent = ProjectTasks::findById($id);
+					$parent = ProjectTasks::instance()->findById($id);
 					if ($parent instanceof ProjectTask) {
 						$task->setParentId($id);
 						$member_ids = $parent->getMemberIds();						
@@ -1354,7 +1354,7 @@ class TaskController extends ApplicationController {
 					if (is_array($previous_tasks)) {
 						foreach ($previous_tasks as $ptask) {
 							if ($ptask == $task->getId()) continue;
-							$dep = ProjectTaskDependencies::findById(array('previous_task_id' => $ptask, 'task_id' => $task->getId()));
+							$dep = ProjectTaskDependencies::instance()->findById(array('previous_task_id' => $ptask, 'task_id' => $task->getId()));
 							if (!$dep instanceof ProjectTaskDependency) {
 								$dep = new ProjectTaskDependency();
 								$dep->setPreviousTaskId($ptask);
@@ -1368,7 +1368,7 @@ class TaskController extends ApplicationController {
 
 				if (array_var($_GET, 'copyId', 0) > 0) {
 					// copy remaining stuff from the task with id copyId
-					$toCopy = ProjectTasks::findById(array_var($_GET, 'copyId'));
+					$toCopy = ProjectTasks::instance()->findById(array_var($_GET, 'copyId'));
 					if ($toCopy instanceof ProjectTask) {
 						ProjectTasks::copySubTasks($toCopy, $task, array_var($task_data, 'is_template', false));
 					}
@@ -1497,7 +1497,7 @@ class TaskController extends ApplicationController {
 		} // if
 
 		$id = get_id();
-		$task = ProjectTasks::findById($id);
+		$task = ProjectTasks::instance()->findById($id);
 		if (!$task instanceof ProjectTask) {
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -1557,7 +1557,7 @@ class TaskController extends ApplicationController {
 		$this->setTemplate('add_task');
 		
 		if(array_var($_REQUEST, "template_task")){
-			$task = TemplateTasks::findById(array_var($_REQUEST, "template_task_id",get_id()));
+			$task = TemplateTasks::instance()->findById(array_var($_REQUEST, "template_task_id",get_id()));
 			$this->setTemplate(get_template_path('add_template_task', 'template_task'));
 			if(array_var($_REQUEST, 'template_id')){
 				$template_id = array_var($_REQUEST, 'template_id');
@@ -1571,7 +1571,7 @@ class TaskController extends ApplicationController {
 				return;
 			} // if
 		}else{				
-			$task = ProjectTasks::findById(get_id());
+			$task = ProjectTasks::instance()->findById(get_id());
 			if(!($task instanceof ProjectTask)) {
 				flash_error(lang('task list dnx'));
 				ajx_current("empty");
@@ -1822,7 +1822,7 @@ class TaskController extends ApplicationController {
 					if (is_array($previous_tasks)) {
 						foreach ($previous_tasks as $ptask) {
 							if ($ptask == $task->getId()) continue;
-							$dep = ProjectTaskDependencies::findById(array('previous_task_id' => $ptask, 'task_id' => $task->getId()));
+							$dep = ProjectTaskDependencies::instance()->findById(array('previous_task_id' => $ptask, 'task_id' => $task->getId()));
 							if (!$dep instanceof ProjectTaskDependency) {
 								$dep = new ProjectTaskDependency();
 								$dep->setPreviousTaskId($ptask);
@@ -1831,12 +1831,12 @@ class TaskController extends ApplicationController {
 							}
 						}
 
-						$saved_ptasks = ProjectTaskDependencies::findAll(array('conditions' => 'task_id = '. $task->getId()));
+						$saved_ptasks = ProjectTaskDependencies::instance()->findAll(array('conditions' => 'task_id = '. $task->getId()));
 						foreach ($saved_ptasks as $pdep) {
 							if (!in_array($pdep->getPreviousTaskId(), $previous_tasks)) $pdep->delete();
 						}
 					} else {
-						ProjectTaskDependencies::delete('task_id = '. $task->getId());
+						ProjectTaskDependencies::instance()->delete('task_id = '. $task->getId());
 					}
 				}
 
@@ -2035,7 +2035,7 @@ class TaskController extends ApplicationController {
 		}
 		ajx_current("empty");
 		$project = active_or_personal_project();
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 		if (!($task instanceof ProjectTask)) {
 			flash_error(lang('task dnx'));
 			return;
@@ -2117,7 +2117,7 @@ class TaskController extends ApplicationController {
 
 	function generate_new_repetitive_instance() {
 		ajx_current("empty");
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 		if (!($task instanceof ProjectTask)) {
 			flash_error(lang('task dnx'));
 			return;
@@ -2189,7 +2189,7 @@ class TaskController extends ApplicationController {
 		}
 	
 		ajx_current("empty");
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 		if(!($task instanceof ProjectTask)) {
 			flash_error(lang('task dnx'));
 			return;
@@ -2284,7 +2284,7 @@ class TaskController extends ApplicationController {
 			return;
 		}
 		ajx_current("empty");
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 		if(!($task instanceof ProjectTask)) {
 			flash_error(lang('task dnx'));
 			return;
@@ -2311,7 +2311,7 @@ class TaskController extends ApplicationController {
 			 while ($parent instanceof ProjectTask && $parent->isCompleted()) {
 				$parent->openTask();
 				$opened_tasks[] = $parent->getId();
-				$milestone = ProjectMilestones::findById($parent->getMilestoneId());
+				$milestone = ProjectMilestones::instance()->findById($parent->getMilestoneId());
 				if ($milestone instanceof ProjectMilestones && $milestone->isCompleted()) {
 				$milestone->setCompletedOn(EMPTY_DATETIME);
 				ajx_extra_data(array("openedMilestone" => $milestone->getId()));
@@ -2360,7 +2360,7 @@ class TaskController extends ApplicationController {
 
 
 		$id = get_id();
-		$task = ProjectTasks::findById($id);
+		$task = ProjectTasks::instance()->findById($id);
 		if (!$task instanceof ProjectTask) {
 			$task_data = array('is_template' => true);
 		} else {
@@ -2396,7 +2396,7 @@ class TaskController extends ApplicationController {
 		$members = array();
 		$member_ids = explode(',', array_var($_GET, 'member_ids'));
 		if (count($member_ids) > 0) {
-			$tmp_members = Members::findAll(array('conditions' => 'id IN ('.implode(',',$member_ids).')'));
+			$tmp_members = Members::instance()->findAll(array('conditions' => 'id IN ('.implode(',',$member_ids).')'));
 			foreach ($tmp_members as $m) {
 				if ($m->getDimension()->getIsManageable()) $members[] = $m;
 			}
@@ -2425,7 +2425,7 @@ class TaskController extends ApplicationController {
 	
 	
 	function change_start_due_date() {
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 		if(!$task->canEdit(logged_user())){
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -2759,7 +2759,7 @@ class TaskController extends ApplicationController {
                     if (is_array($previous_tasks)) {
                             foreach ($previous_tasks as $ptask) {
                                     if ($ptask == $task->getId()) continue;
-                                    $dep = ProjectTaskDependencies::findById(array('previous_task_id' => $ptask, 'task_id' => $task->getId()));
+                                    $dep = ProjectTaskDependencies::instance()->findById(array('previous_task_id' => $ptask, 'task_id' => $task->getId()));
                                     if (!$dep instanceof ProjectTaskDependency) {
                                             $dep = new ProjectTaskDependency();
                                             $dep->setPreviousTaskId($ptask);
@@ -2768,12 +2768,12 @@ class TaskController extends ApplicationController {
                                     }
                             }
 
-                            $saved_ptasks = ProjectTaskDependencies::findAll(array('conditions' => 'task_id = '. $task->getId()));
+                            $saved_ptasks = ProjectTaskDependencies::instance()->findAll(array('conditions' => 'task_id = '. $task->getId()));
                             foreach ($saved_ptasks as $pdep) {
                                     if (!in_array($pdep->getPreviousTaskId(), $previous_tasks)) $pdep->delete();
                             }
                     } else {
-                            ProjectTaskDependencies::delete('task_id = '. $task->getId());
+                            ProjectTaskDependencies::instance()->delete('task_id = '. $task->getId());
                     }
             }
 
@@ -2822,7 +2822,7 @@ class TaskController extends ApplicationController {
             //I find all those related to the task to find out if the original
             $task_related = ProjectTasks::findByRelated(array_var($_REQUEST, 'related_id'));
             if(!$task_related){
-                $task_related = ProjectTasks::findById(array_var($_REQUEST, 'related_id'));
+                $task_related = ProjectTasks::instance()->findById(array_var($_REQUEST, 'related_id'));
                 //is not the original as the original look plus other related
                 if($task_related->getOriginalTaskId() != "0"){
                     ajx_extra_data(array("status" => true));

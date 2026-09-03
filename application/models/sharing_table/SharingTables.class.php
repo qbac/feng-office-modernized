@@ -13,7 +13,7 @@ class SharingTables extends BaseSharingTables {
 		}
 		
 		// Delete old rows
-		self::delete("object_id = $objectId");
+		self::instance()->delete("object_id = $objectId");
 
 		// Insert new rows
 		$table = self::getTableName();

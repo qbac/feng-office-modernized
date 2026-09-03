@@ -15,7 +15,7 @@
 	$token = array_var($argv, 3);
 	
 	// log user in
-	$user = Contacts::findById($user_id);
+	$user = Contacts::instance()->findById($user_id);
 	if(!($user instanceof Contact) || !$user->isValidToken($token)) {
 		throw new Exception("Cannot login with user $user_id and token '$token'");
 	}
@@ -100,7 +100,7 @@
 	try {
 		DB::beginWork();
 		$contactMemberCacheController = new ContactMemberCacheController();
-		$group = PermissionGroups::findById($pg_id);
+		$group = PermissionGroups::instance()->findById($pg_id);
 		
 		$real_group = null;
 		if($group->getType() == 'user_groups'){
@@ -119,7 +119,7 @@
 		foreach ($users_ids_to_check as $us_id) {
 			if(!in_array($us_id, $users_ids_checked)){
 				$users_ids_checked[] = $us_id;
-				$us = Contacts::findById($us_id);
+				$us = Contacts::instance()->findById($us_id);
 				if($us instanceof Contact){
 					$contactMemberCacheController->afterUserPermissionChanged($us, json_decode($permissions), $real_group);
 				}

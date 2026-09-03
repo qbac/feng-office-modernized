@@ -22,7 +22,7 @@ class  ContactMemberCacheController extends ApplicationController {
 			}
 		}else{
 			// dimension
-			$dimensions = Dimensions::findAll();
+			$dimensions = Dimensions::instance()->findAll();
 			$contact_pg_ids = $group->getId();
 			
 			//get all allowed members for the group
@@ -65,7 +65,7 @@ class  ContactMemberCacheController extends ApplicationController {
 		if(count($permissionGroupIds) > 0){	
 			$usersIds = ContactPermissionGroups::getAllContactsIdsByPermissionGroupIds($permissionGroupIds);
 			foreach ($usersIds as $us_id) {
-				$user = Contacts::findById($us_id);
+				$user = Contacts::instance()->findById($us_id);
 				ContactMemberCaches::updateContactMemberCache($user, $member->getId());
 			}
 			

@@ -158,9 +158,9 @@ og.config.multi_assignment = '<?php echo config_option('multi_assignment') && Pl
     			
     		<?php }else{
     			if(array_var($_GET, 'template_task', false)){
- 					$parentTask = TemplateTasks::findById($task_data['parent_id']);
+ 					$parentTask = TemplateTasks::instance()->findById($task_data['parent_id']);
  				}else{
-					$parentTask = ProjectTasks::findById($task_data['parent_id']);
+					$parentTask = ProjectTasks::instance()->findById($task_data['parent_id']);
 				}
  				if ($parentTask instanceof ProjectTask || $parentTask instanceof TemplateTask){?>
  				<span style="display: none;" id="no-task-selected<?php echo $genid?>"><?php echo lang('none')?></span>
@@ -236,7 +236,7 @@ og.config.multi_assignment = '<?php echo config_option('multi_assignment') && Pl
 		<?php echo label_tag(lang('previous tasks')) ?>
 		<?php 	
 			if (!$task->isNew())
-				$previous_tasks = ProjectTaskDependencies::findAll(array('conditions' => 'task_id = '.$task->getId()));
+				$previous_tasks = ProjectTaskDependencies::instance()->findAll(array('conditions' => 'task_id = '.$task->getId()));
 			else $previous_tasks = array();
 		?>
 			<div>
@@ -252,7 +252,7 @@ og.config.multi_assignment = '<?php echo config_option('multi_assignment') && Pl
 				<input type="hidden" name="task[clean_dep]" value="1" />
 				<?php 
 				foreach ($previous_tasks as $task_dep) {
-					$task = TemplateTasks::findById($task_dep->getPreviousTaskId());
+					$task = TemplateTasks::instance()->findById($task_dep->getPreviousTaskId());
 				?>
 					<div class="og-add-template-object ico-task">
 						<input type="hidden" name="task[previous]['<?php echo $k?>']" value="<?php echo $task->getId()?>" />

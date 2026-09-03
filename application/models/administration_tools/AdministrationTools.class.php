@@ -14,7 +14,7 @@
     * @return array
     */
     function getAll() {
-      return self::findAll(array(
+      return self::instance()->findAll(array(
         'order' => '`order`'
       )); // findAll
     } // getAll
@@ -26,7 +26,7 @@
     * @return AdministrationTool
     */
     function getByName($name) {
-      return self::findOne(array(
+      return self::instance()->findOne(array(
         'conditions' => array('`name` = ?', $name),
       )); // findOne
     } // getByName

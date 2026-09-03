@@ -118,7 +118,7 @@ function core_dimensions_update_7_8() {
 	ini_set('memory_limit', '512M');
 	$users = Contacts::getAllUsers();
 		
-	$dimensions = Dimensions::findAll();
+	$dimensions = Dimensions::instance()->findAll();
 	$dimensions_ids = array();
 	foreach ($dimensions as $dimension) {
 		if ($dimension->getDefinesPermissions()) {

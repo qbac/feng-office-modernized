@@ -134,7 +134,7 @@ class BillingCategory extends BaseBillingCategory {
 	}
 	
 	function getCategoryUsers() {
-		return Contacts::findAll(array('conditions' => 'default_billing_id = ' . $this->getId()));
+		return Contacts::instance()->findAll(array('conditions' => 'default_billing_id = ' . $this->getId()));
 	}
 	
 	// ---------------------------------------------------

@@ -66,7 +66,7 @@ class EventController extends ApplicationController {
 		foreach ($invitations as $id => $assist) {
 			$conditions = array('event_id' => $event->getId(), 'contact_id' => $id);
 			//insert only if not exists 
-			if (EventInvitations::findById($conditions) == null) {
+			if (EventInvitations::instance()->findById($conditions) == null) {
 				$invitation = new EventInvitation();
 				$invitation->setEventId($event->getId());
 				$invitation->setContactId($id);
@@ -78,7 +78,7 @@ class EventController extends ApplicationController {
 			}
 		}
 		// Delete non checked invitations
-		$previuos_invitations = EventInvitations::findAll(array('conditions' => '`event_id` = ' . $event->getId()));
+		$previuos_invitations = EventInvitations::instance()->findAll(array('conditions' => '`event_id` = ' . $event->getId()));
 		foreach ($previuos_invitations as $pinv) {
 			if (!array_key_exists($pinv->getContactId(), $invitations)) $pinv->delete();
 		}
@@ -101,9 +101,9 @@ class EventController extends ApplicationController {
 			ajx_current("back");
 		} else {
 			$conditions = array('conditions' => "`event_id` = " . DB::escape($event_id) . " AND `contact_id` = ". DB::escape($user_id));
-			$inv = EventInvitations::findOne($conditions);
+			$inv = EventInvitations::instance()->findOne($conditions);
 			$conditions_all = array('conditions' => "`event_id` = " . DB::escape($event_id));
-			$invs = EventInvitations::findAll($conditions_all);			
+			$invs = EventInvitations::instance()->findAll($conditions_all);			
 			if ($inv != null) {
 				if ($inv->getContactId() != logged_user()->getId()) {
 					flash_error(lang('no access permissions'));					
@@ -124,9 +124,9 @@ class EventController extends ApplicationController {
 			}
 			if ($from_post_get) {
 				// Notify creator (only when invitation is accepted or declined)
-				$event = ProjectEvents::findById(array('id' => $event_id));
+				$event = ProjectEvents::instance()->findById(array('id' => $event_id));
 				if ($inv->getInvitationState() == 1 || $inv->getInvitationState() == 2) {
-					$user = Contacts::findById(array('id' => $user_id));
+					$user = Contacts::instance()->findById(array('id' => $user_id));
 					session_commit();
 					Notifier::notifEventAssistance($event, $inv, $user, $invs);
 					if ($inv->getInvitationState() == 1) flash_success(lang('invitation accepted'));
@@ -470,7 +470,7 @@ class EventController extends ApplicationController {
 					$users_to_inv = array();
 					foreach ($data['users_to_invite'] as $us => $v) {
 						if ($us != logged_user()->getId()) {
-							$users_to_inv[] = Contacts::findById(array('id' => $us));
+							$users_to_inv[] = Contacts::instance()->findById(array('id' => $us));
 						}
 					}
 					Notifier::notifEvent($event, $users_to_inv, 'new', logged_user());
@@ -497,7 +497,7 @@ class EventController extends ApplicationController {
 			return;
 		}
 		//check auth
-		$event = ProjectEvents::findById(get_id());
+		$event = ProjectEvents::instance()->findById(get_id());
 		if ($event != null) {
 		    if(!$event->canDelete(logged_user())){	    	
 				flash_error(lang('no access permissions'));
@@ -515,7 +515,7 @@ class EventController extends ApplicationController {
 			}
 			$events = array();
 			foreach($ev_ids as $id) {
-				$e = ProjectEvents::findById($id);
+				$e = ProjectEvents::instance()->findById($id);
 				if ($e instanceof ProjectEvent) $events[] = $e;
 			}
 		}
@@ -526,15 +526,15 @@ class EventController extends ApplicationController {
 		try {
 			foreach ($events as $event) {
 				$notifications = array();
-				$invs = EventInvitations::findAll(array ('conditions' => 'event_id = ' . $event->getId()));
+				$invs = EventInvitations::instance()->findAll(array ('conditions' => 'event_id = ' . $event->getId()));
 				if (is_array($invs)) {
 					foreach ($invs as $inv) {
 						if ($inv->getContactId() != logged_user()->getId()) 
-							$notifications[] = Contacts::findById(array('id' => $inv->getContactId()));
+							$notifications[] = Contacts::instance()->findById(array('id' => $inv->getContactId()));
 					}
 				} else {
 					if ($invs->getContactId() != logged_user()->getId()) 
-						$notifications[] = Contacts::findById(array('id' => $invs->getContactId()));
+						$notifications[] = Contacts::instance()->findById(array('id' => $invs->getContactId()));
 				}
 				//Notifier::notifEvent($event, $notifications, 'deleted', logged_user());
 				try {
@@ -578,7 +578,7 @@ class EventController extends ApplicationController {
 			return;
 		}
 		//check auth
-		$event = ProjectEvents::findById(get_id());
+		$event = ProjectEvents::instance()->findById(get_id());
 		if ($event != null) {
 		    if(!$event->canDelete(logged_user())){	    	
 				flash_error(lang('no access permissions'));
@@ -595,7 +595,7 @@ class EventController extends ApplicationController {
 			}
 			$events = array();
 			foreach($ev_ids as $id) {
-				$e = ProjectEvents::findById($id);
+				$e = ProjectEvents::instance()->findById($id);
 				if ($e instanceof ProjectEvent) $events[] = $e;
 			}
 		}
@@ -692,9 +692,9 @@ class EventController extends ApplicationController {
 		foreach ($users as $user) {
 			if ($user->getCompanyId()) $company_ids[] = $user->getCompanyId();
 		}
-		$companies = Contacts::findAll(array("conditions" => "is_company = 1 AND object_id IN (".implode(",", $company_ids).")"));
+		$companies = Contacts::instance()->findAll(array("conditions" => "is_company = 1 AND object_id IN (".implode(",", $company_ids).")"));
 		
-		$usr = Contacts::findById($user_filter);
+		$usr = Contacts::instance()->findById($user_filter);
 		$user_filter_comp = $usr != null ? $usr->getCompanyId() : 0;
 
 		tpl_assign('users', $users);
@@ -752,7 +752,7 @@ class EventController extends ApplicationController {
 		//check auth
 		$this->addHelper('textile');
 		ajx_set_no_toolbar(true);
-	    $event = ProjectEvents::findById(get_id());
+	    $event = ProjectEvents::instance()->findById(get_id());
 	    if (isset($event) && $event != null) {
 		    if(!$event->canView(logged_user())){
 				flash_error(lang('no access permissions'));
@@ -789,11 +789,11 @@ class EventController extends ApplicationController {
 			return;
 		}
 		$this->setTemplate('event');
-		$event = ProjectEvents::findById(get_id());
+		$event = ProjectEvents::instance()->findById(get_id());
 		
 		$user_filter = isset($_GET['user_id']) ? $_GET['user_id'] : logged_user()->getId();
 		
-		$inv = EventInvitations::findById(array('event_id' => $event->getId(), 'contact_id' => $user_filter));
+		$inv = EventInvitations::instance()->findById(array('event_id' => $event->getId(), 'contact_id' => $user_filter));
 		if ($inv != null) {
 			$event->addInvitation($inv);
 		}
@@ -904,7 +904,7 @@ class EventController extends ApplicationController {
 			if (array_var($_POST,'merge-changes') == 'true')
 			{					
 				$this->setTemplate('view_event');
-				$editedEvent = ProjectEvents::findById($event->getId());
+				$editedEvent = ProjectEvents::instance()->findById($event->getId());
 				$this->view();
 				ajx_set_panel(lang ('tab name',array('name'=>$editedEvent->getTitle())));
 				ajx_extra_data(array("title" => $editedEvent->getTitle(), 'icon'=>'ico-event'));
@@ -968,7 +968,7 @@ class EventController extends ApplicationController {
                                                     $users_to_inv = array();
                                     foreach ($data['users_to_invite'] as $us => $v) {
                                             if ($us != logged_user()->getId()) {
-                                                    $users_to_inv[] = Contacts::findById(array('id' => $us));
+                                                    $users_to_inv[] = Contacts::instance()->findById(array('id' => $us));
                                             }
                                     }
                                     Notifier::notifEvent($event, $users_to_inv, 'modified', logged_user());
@@ -1041,7 +1041,7 @@ class EventController extends ApplicationController {
 		$evid = array_var($_GET, 'evid');
 		
 		$i = 0;
-		$companies_tmp = Contacts::findAll(array("conditions" => "is_company = 1"));
+		$companies_tmp = Contacts::instance()->findAll(array("conditions" => "is_company = 1"));
 		$companies = array("0" => array('id' => $i++, 'name' => lang('without company'), 'logo_url' => '#'));
 		foreach ($companies_tmp as $comptmp) {
 			$companies[$comptmp->getId()] = array(
@@ -1072,7 +1072,7 @@ class EventController extends ApplicationController {
 							'id' => $user->getId(),
 							'name' => $user->getObjectName(),
 							'avatar_url' => $user->getPictureUrl(),
-							'invited' => $evid == 0 ? ($user->getId() == $actual_user_id) : (EventInvitations::findOne(array('conditions' => "`event_id` = $evid and `contact_id` = ".$user->getId())) != null),
+							'invited' => $evid == 0 ? ($user->getId() == $actual_user_id) : (EventInvitations::instance()->findOne(array('conditions' => "`event_id` = $evid and `contact_id` = ".$user->getId())) != null),
 							'mail' => $user->getEmailAddress()
 						);
 					}
@@ -1124,7 +1124,7 @@ class EventController extends ApplicationController {
 
 							$conditions = array('event_id' => $event->getId(), 'contact_id' => logged_user()->getId());
 							//insert only if not exists
-							if (EventInvitations::findById($conditions) == null) {
+							if (EventInvitations::instance()->findById($conditions) == null) {
 								$invitation = new EventInvitation();
 								$invitation->setEventId($event->getId());
 								$invitation->setContactId(logged_user()->getId());
@@ -1234,7 +1234,7 @@ class EventController extends ApplicationController {
 			ajx_current("empty");
 			return;
 		}
-		$event = ProjectEvents::findById(get_id());
+		$event = ProjectEvents::instance()->findById(get_id());
 		if(!$event->canEdit(logged_user())){	    	
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -1272,7 +1272,7 @@ class EventController extends ApplicationController {
 			ajx_current("empty");
 			return;
 		}
-		$event = ProjectEvents::findById(get_id());
+		$event = ProjectEvents::instance()->findById(get_id());
 		if(!$event->canEdit(logged_user())){	    	
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
@@ -1384,7 +1384,7 @@ class EventController extends ApplicationController {
 			}
 			$events = array();
 			foreach($ev_ids as $id) {
-				$event = ProjectEvents::findById($id);
+				$event = ProjectEvents::instance()->findById($id);
 				$event->setIsRead(logged_user()->getId(),true);
 			}
 			ajx_current("reload");
@@ -1399,15 +1399,15 @@ class EventController extends ApplicationController {
 			}
 			$events = array();
 			foreach($ev_ids as $id) {
-				$event = ProjectEvents::findById($id);
+				$event = ProjectEvents::instance()->findById($id);
 				$event->setIsRead(logged_user()->getId(),false);
 			}
 			ajx_current("reload");
 	}
 	
 	private function update_sync_cron_events() {
-		$count = ExternalCalendarUsers::count();
-		$events = CronEvents::findAll(array('conditions' => "name IN ('import_google_calendar','export_google_calendar')"));
+		$count = ExternalCalendarUsers::instance()->count();
+		$events = CronEvents::instance()->findAll(array('conditions' => "name IN ('import_google_calendar','export_google_calendar')"));
 		foreach ($events as $event) {
 			if ($count > 0) {
 				if (!$event->getEnabled()) {
@@ -1504,7 +1504,7 @@ class EventController extends ApplicationController {
                 
                 $cal_data = array();
                 if(get_id('cal_id')){
-                    $edit_calendar = ExternalCalendars::findById(get_id('cal_id'));
+                    $edit_calendar = ExternalCalendars::instance()->findById(get_id('cal_id'));
                     
                     $cal_data['id'] = $edit_calendar->getId();
                     
@@ -1546,7 +1546,7 @@ class EventController extends ApplicationController {
                     }
                     $members = rtrim($members, ",");
                     
-                    $user_cal = ExternalCalendarUsers::findById(get_id('cal_user_id'));
+                    $user_cal = ExternalCalendarUsers::instance()->findById(get_id('cal_user_id'));
                     if($user_cal){
                         $user_cal->setAuthUser(array_var($_POST, 'auth_user'));
                         $user_cal->setAuthPass(array_var($_POST, 'auth_pass'));
@@ -1594,7 +1594,7 @@ class EventController extends ApplicationController {
                     array_pop($link);                     
                     $calendar_user = end($link);
                     
-                    $calendar = ExternalCalendars::findById(get_id('cal_id'));
+                    $calendar = ExternalCalendars::instance()->findById(get_id('cal_id'));
                     if($calendar){
                         $calendar->setCalendarUser($calendar_user);
                         $calendar->setCalendarVisibility($calendar_visibility);
@@ -1668,7 +1668,7 @@ class EventController extends ApplicationController {
                 $pass = $users->getAuthPass();
                 $service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;             
                 
-                $calendar = ExternalCalendars::findById(get_id('cal_id'));
+                $calendar = ExternalCalendars::instance()->findById(get_id('cal_id'));
                 $events = ProjectEvents::findByExtCalId($calendar->getId());
                 
                 $calendar_user = $calendar->getCalendarUser();
@@ -1726,7 +1726,7 @@ class EventController extends ApplicationController {
 		}
 		
 		if (!$users instanceof ExternalCalendarUser) return;
-		$calendar = ExternalCalendars::findById($event->getExtCalId());
+		$calendar = ExternalCalendars::instance()->findById($event->getExtCalId());
 		if (!$calendar instanceof ExternalCalendar) return;
 		//if($calendar->getCalendarUser() != logged_user()->getId()){
 			 
@@ -1924,10 +1924,10 @@ class EventController extends ApplicationController {
                                       /*  if(array_pop(explode( '.', $event->getEventStatus() )) == "canceled"){
                                         	if($new_event|| $is_invitation){
                                             	if($is_invitation){
-                                            		$new_event = ProjectEvents::findById($is_invitation->getEventId());
+                                            		$new_event = ProjectEvents::instance()->findById($is_invitation->getEventId());
                                             	}
                                         		$event_controller->delete_event_calendar_extern($new_event);
-                                        		EventInvitations::delete(array("conditions"=>"event_id = ".$new_event->getId()));
+                                        		EventInvitations::instance()->delete(array("conditions"=>"event_id = ".$new_event->getId()));
                                         		$new_event->trash();
                                         		 
                                         		$new_event->setSpecialID("");
@@ -1939,21 +1939,21 @@ class EventController extends ApplicationController {
                                         if(array_pop(explode( '.', $event->getEventStatus() )) == "canceled"){
                                         	//$event_controller->delete_event_calendar_extern($new_event);
                                         	if($new_event){
-                                        		EventInvitations::delete(array("conditions"=>"event_id = ".$new_event->getId()));
+                                        		EventInvitations::instance()->delete(array("conditions"=>"event_id = ".$new_event->getId()));
                                         		$new_event->trash();
                                         		 
                                         		$new_event->setSpecialID("");
                                         		$new_event->setExtCalId(0);
                                         		$new_event->save();
                                         	}elseif ($is_invitation){
-                                        		//$new_event = ProjectEvents::findById($is_invitation->getEventId());
-                                        		EventInvitations::delete(array("conditions"=>"special_id = '".$special_id."'"));
+                                        		//$new_event = ProjectEvents::instance()->findById($is_invitation->getEventId());
+                                        		EventInvitations::instance()->delete(array("conditions"=>"special_id = '".$special_id."'"));
                                         
                                         	}
                                         }else{
                                         if($new_event|| $is_invitation){
                                             	if($is_invitation){
-                                            		$new_event = ProjectEvents::findById($is_invitation->getEventId());
+                                            		$new_event = ProjectEvents::instance()->findById($is_invitation->getEventId());
                                             	}
                                             if(strtotime(ProjectEvents::date_google_to_sql($event->updated)) > $new_event->getUpdateSync()->getTimestamp()){
                                                 $start = strtotime(ProjectEvents::date_google_to_sql($event->when[0]->startTime));
@@ -2055,7 +2055,7 @@ class EventController extends ApplicationController {
                                             
                                             $conditions = array('event_id' => $new_event->getId(), 'contact_id' => logged_user()->getId());
                                             //insert only if not exists 
-                                            if (EventInvitations::findById($conditions) == null) { 
+                                            if (EventInvitations::instance()->findById($conditions) == null) { 
                                                 $invitation = new EventInvitation();
                                                 $invitation->setEventId($new_event->getId());
                                                 $invitation->setContactId(logged_user()->getId());
@@ -2178,7 +2178,7 @@ class EventController extends ApplicationController {
                                         $event->setUpdateSync(ProjectEvents::date_google_to_sql($createdEvent->updated));
                                         $event->setExtCalId($calendar_feng['id']);
                                         $event->save();
-                                    $invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.logged_user()->getId().' AND event_id ='.$event->getId())));
+                                    $invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.logged_user()->getId().' AND event_id ='.$event->getId())));
                                         	if($invitation){
                                         		$invitation->setUpdateSync();
                                         		$invitation->setSpecialId($special_id);
@@ -2213,7 +2213,7 @@ class EventController extends ApplicationController {
                                         	$event_id = explode("/",$createdEvent->id->text);
                                         	$special_id = end($event_id);
                                         	 
-                                        	$invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.logged_user()->getId().' AND event_id ='.$event->getId())));
+                                        	$invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.logged_user()->getId().' AND event_id ='.$event->getId())));
                                         	if($invitation){
                                         		$invitation->setUpdateSync();
                                         		$invitation->setSpecialId($special_id);
@@ -2294,7 +2294,7 @@ class EventController extends ApplicationController {
                                         $event->setUpdateSync(ProjectEvents::date_google_to_sql($createdEvent->updated));
                                         $event->setExtCalId($calendar->getId());
                                         $event->save();
-                                    	$invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.logged_user()->getId().' AND event_id ='.$event->getId())));
+                                    	$invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.logged_user()->getId().' AND event_id ='.$event->getId())));
                                         	if($invitation){
                                         		$invitation->setUpdateSync();
                                         		$invitation->setSpecialId($special_id);
@@ -2328,7 +2328,7 @@ class EventController extends ApplicationController {
                                     
                                     	$event_id = explode("/",$createdEvent->id->text);
                                     	$special_id = end($event_id);
-                                    	$invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
+                                    	$invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
                                     	if($invitation){
                                     		$invitation->setUpdateSync();
                                     		$invitation->setSpecialId($special_id);
@@ -2537,7 +2537,7 @@ class EventController extends ApplicationController {
             //I find all those related to the task to find out if the original
             $event_related = ProjectEvents::findByRelated(array_var($_REQUEST, 'related_id'));
             if(!$event_related){
-                $event_related = ProjectEvents::findById(array_var($_REQUEST, 'related_id'));
+                $event_related = ProjectEvents::instance()->findById(array_var($_REQUEST, 'related_id'));
                 //is not the original as the original look plus other related
                 if($event_related->getOriginalEventId() != "0"){
                     ajx_extra_data(array("status" => true));

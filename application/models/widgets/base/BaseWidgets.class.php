@@ -35,7 +35,7 @@ abstract class BaseWidgets extends DataManager {
 	 * @param void
 	 * @return array
 	 */
-	function getColumns() {
+	static function getColumns() {
 		return array_keys ( self::$columns );
 	} // getColumns
 	
@@ -119,15 +119,15 @@ abstract class BaseWidgets extends DataManager {
 			return Widgets::instance ()->delete ( $condition );
 		}
 	}
-	function paginate($arguments = null, $items_per_page = 10, $current_page = 1) {
+	function paginate($arguments = null, $items_per_page = 10, $current_page = 1, $count = null) {
 		if (isset ( $this ) && instance_of ( $this, 'Widgets' )) {
-			return parent::paginate ( $arguments, $items_per_page, $current_page );
+			return parent::paginate($arguments, $items_per_page, $current_page, $count);
 		} else {
-			return Widgets::instance ()->paginate ( $arguments, $items_per_page, $current_page );
+			return Widgets::instance ()->paginate($arguments, $items_per_page, $current_page, $count);
 		}
 	}
 	
-	function instance() {
+	static function instance() {
 		static $instance;
 		if (! instance_of ( $instance, 'Widgets' )) {
 			$instance = new Widgets ();

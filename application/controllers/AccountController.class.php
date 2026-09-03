@@ -50,7 +50,7 @@ class AccountController extends ApplicationController {
 	 */
 	function edit_profile() {
 		ajx_set_panel("");
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if(!($user instanceof Contact && $user->isUser()) || $user->getDisabled()) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");
@@ -95,7 +95,7 @@ class AccountController extends ApplicationController {
 		tpl_assign('user', $user);
 		tpl_assign('company', $company);
 		tpl_assign('user_data', $user_data);
-		tpl_assign('billing_categories', BillingCategories::findAll());
+		tpl_assign('billing_categories', BillingCategories::instance()->findAll());
 		// Permission Groups
 		$groups = PermissionGroups::getNonPersonalSameLevelPermissionsGroups('`parent_id`,`id` ASC');
 		tpl_assign('groups', $groups);
@@ -106,7 +106,7 @@ class AccountController extends ApplicationController {
 		// Submit user
 		if(is_array(array_var($_POST, 'user'))) {
 			$company_id = array_var($user_data,'company_id');
-			if($company_id && !(Contacts::findById($company_id) instanceof Contact)){
+			if($company_id && !(Contacts::instance()->findById($company_id) instanceof Contact)){
 				ajx_current("empty");
 				flash_error(lang("company dnx"));
 				return ;
@@ -158,7 +158,7 @@ class AccountController extends ApplicationController {
 	 * @return null
 	 */
 	function edit_password() {
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if(!($user instanceof Contact && $user->isUser()) || $user->getDisabled()) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");
@@ -235,7 +235,7 @@ class AccountController extends ApplicationController {
 	 * @return null
 	 */
 	function update_permissions() {
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if(!($user instanceof Contact && $user->isUser()) || $user->getDisabled()) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");
@@ -260,19 +260,19 @@ class AccountController extends ApplicationController {
 			$parameters = permission_form_parameters($pg_id);
 			
 			// Module Permissions
-			$module_permissions = TabPanelPermissions::findAll(array("conditions" => "`permission_group_id` = $pg_id"));
+			$module_permissions = TabPanelPermissions::instance()->findAll(array("conditions" => "`permission_group_id` = $pg_id"));
 			$module_permissions_info = array();
 			foreach ($module_permissions as $mp) {
 				$module_permissions_info[$mp->getTabPanelId()] = 1;
 			}
-			$all_modules = TabPanels::findAll(array("conditions" => "`enabled` = 1", "order" => "ordering"));
+			$all_modules = TabPanels::instance()->findAll(array("conditions" => "`enabled` = 1", "order" => "ordering"));
 			$all_modules_info = array();
 			foreach ($all_modules as $module) {
 				$all_modules_info[] = array('id' => $module->getId(), 'name' => lang($module->getTitle()), 'ot' => $module->getObjectTypeId());
 			}
 			
 			// System Permissions
-			$system_permissions = SystemPermissions::findById($pg_id);
+			$system_permissions = SystemPermissions::instance()->findById($pg_id);
 			
 			tpl_assign('module_permissions_info', $module_permissions_info);
 			tpl_assign('all_modules_info', $all_modules_info);
@@ -333,7 +333,7 @@ class AccountController extends ApplicationController {
 	 * @return null
 	 */
 	function edit_avatar() {
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if (!($user instanceof Contact && $user->isUser()) || $user->getDisabled()) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");
@@ -401,7 +401,7 @@ class AccountController extends ApplicationController {
 	 * @return null
 	 */
 	function delete_avatar() {
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if(!($user instanceof Contact && $user->isUser()) || $user->getDisabled()) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");
@@ -466,7 +466,7 @@ class AccountController extends ApplicationController {
 	}
 	
 	function disable() {
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if (!($user instanceof Contact && $user->isUser())) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");
@@ -505,7 +505,7 @@ class AccountController extends ApplicationController {
 	
 	
 	function delete_user() {
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if (!($user instanceof Contact && $user->isUser())) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");
@@ -541,7 +541,7 @@ class AccountController extends ApplicationController {
 	}
 	
 	function restore_user() {
-		$user = Contacts::findById(get_id());
+		$user = Contacts::instance()->findById(get_id());
 		if (!($user instanceof Contact && $user->isUser())) {
 			flash_error(lang('user dnx'));
 			ajx_current("empty");

@@ -42,7 +42,7 @@ abstract class BaseWorkspaces extends ContentDataObjects {
 	 * @param void
 	 * @return array
 	 */
-	function getColumns() {
+	static function getColumns() {
 		return array_keys(self::$columns);
 	} // getColumns
 
@@ -211,7 +211,7 @@ abstract class BaseWorkspaces extends ContentDataObjects {
 	 *
 	 * @return Workspaces
 	 */
-	function instance() {
+	static function instance() {
 		static $instance;
 		if(!instance_of($instance, 'Workspaces')) {
 			$instance = new Workspaces();

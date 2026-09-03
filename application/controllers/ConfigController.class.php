@@ -38,7 +38,7 @@ class ConfigController extends ApplicationController {
 			ajx_current("empty");
 			return ;
 		} // if
-		$category = ConfigCategories::findById(get_id());
+		$category = ConfigCategories::instance()->findById(get_id());
 		if(!($category instanceof ConfigCategory)) {
 			flash_error(lang('config category dnx'));
 			$this->redirectToReferer(get_url('administration'));
@@ -150,7 +150,7 @@ class ConfigController extends ApplicationController {
 	 *
 	 */
 	function update_default_user_preferences(){
-		$category = ContactConfigCategories::findById(get_id());
+		$category = ContactConfigCategories::instance()->findById(get_id());
 		if(!($category instanceof ContactConfigCategory)) {
 			flash_error(lang('config category dnx'));
 			$this->redirectToReferer(get_url('user','card'));

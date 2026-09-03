@@ -40,8 +40,8 @@
 
 <b><?php echo lang('new account step actions',$step) ?></b>
 	<?php 
-	$task_count = ProjectTasks::count('`created_by_id` = ' . logged_user()->getId());
-	$note_count = ProjectMessages::count('`created_by_id` = '.logged_user()->getId());
+	$task_count = ProjectTasks::instance()->count('`created_by_id` = ' . logged_user()->getId());
+	$note_count = ProjectMessages::instance()->count('`created_by_id` = '.logged_user()->getId());
 	//$contact = ProjectContacts::findOne(array('conditions'=>'created_by_id='.logged_user()->getId()));
 	if ($task_count > 0 || $note_count > 0) {
 		echo '<img src="'.image_url('16x16/complete.png').'" />';

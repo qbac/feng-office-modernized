@@ -50,7 +50,7 @@
 		if(can_manage_security(logged_user())){
 			//users to display on the combo
 			$intersection_condition = count($intersection) > 0 ? 'o.id NOT IN ('.implode(',',$intersection).') AND' : '';
-			$contacts_for_combo = Contacts::findAll(array(
+			$contacts_for_combo = Contacts::instance()->findAll(array(
 				'conditions' => $intersection_condition . ' `is_company` = 0 AND `user_type` > '.logged_user()->getUserType().' AND disabled = 0',
 				'order' => 'first_name',
 				'order_dir' => 'desc',

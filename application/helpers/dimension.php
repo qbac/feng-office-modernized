@@ -41,7 +41,7 @@ function render_member_selectors($content_object_type_id, $genid = null, $select
 			
 			// Set view variables
 			$manageable_conds = ' AND dimension_id IN (SELECT id from '.TABLE_PREFIX.'dimensions WHERE is_manageable=1)';
-			$selected_members = count($selected_member_ids) > 0 ? Members::findAll(array('conditions' => 'id IN ('.implode(',', $selected_member_ids).') '.$manageable_conds)) : array();
+			$selected_members = count($selected_member_ids) > 0 ? Members::instance()->findAll(array('conditions' => 'id IN ('.implode(',', $selected_member_ids).') '.$manageable_conds)) : array();
 			$selected_member_ids = array();
 			foreach ($selected_members as $sm) $selected_member_ids[] = $sm->getId();
 			$selected_members_json = "[".implode(',', $selected_member_ids)."]";
@@ -56,7 +56,7 @@ function render_member_selectors($content_object_type_id, $genid = null, $select
 			if (count($initial_selected_members) == 0) {
 				$selected_context_member_ids = active_context_members(false);
 				if (count($selected_context_member_ids) > 0) {
-					$initial_selected_members = Members::findAll(array('conditions' => 'id IN ('.implode(',', $selected_context_member_ids).')'));
+					$initial_selected_members = Members::instance()->findAll(array('conditions' => 'id IN ('.implode(',', $selected_context_member_ids).')'));
 				}
 			}
 			
@@ -101,7 +101,7 @@ function render_single_member_selector(Dimension $dimension, $genid = null, $sel
 	if (is_null($selected_member_ids)) $selected_member_ids = array();
 			
 	// Set view variables
-	$selected_members = count($selected_member_ids) > 0 ? Members::findAll(array('conditions' => 'id IN ('.implode(',', $selected_member_ids).')')) : array();
+	$selected_members = count($selected_member_ids) > 0 ? Members::instance()->findAll(array('conditions' => 'id IN ('.implode(',', $selected_member_ids).')')) : array();
 	$selected_members_json = "[".implode(',', $selected_member_ids)."]";
 	$component_id = "$genid-member-selectors-panel-$content_object_type_id";
 	

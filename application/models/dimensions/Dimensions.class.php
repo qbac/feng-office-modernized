@@ -13,7 +13,7 @@
   	static function getDimensionById($id) {
   		$dim = array_var(self::$dimensions_by_id, $id);
   		if (!$dim instanceof Dimension) {
-  			$dim = Dimensions::findById($id);
+  			$dim = Dimensions::instance()->findById($id);
   			if ($dim instanceof Dimension) self::$dimensions_by_id[$id] = $dim;
   		}
   		return $dim;
@@ -32,7 +32,7 @@
   		}
   		
   		$search_condition = "`$dim_field` = $associated_dimension_id AND `$ot_field` = $associated_object_type";
-  		$associations = DimensionMemberAssociations::findAll(array('conditions' => $search_condition));
+  		$associations = DimensionMemberAssociations::instance()->findAll(array('conditions' => $search_condition));
   		// TODO: Hacerlo recursivo cuando get_properties = true
   		
   		$dimensions = array();
@@ -82,7 +82,7 @@
 	 */
 	static function findByCode($code) {
 		if (count(self::$dimensions_by_code) == 0) {
-			$dims = Dimensions::findAll();
+			$dims = Dimensions::instance()->findAll();
 			foreach ($dims as $dim) self::$dimensions_by_code[$dim->getCode()] = $dim;
 		}
 		return array_var(self::$dimensions_by_code, $code);

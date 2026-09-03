@@ -32,7 +32,7 @@ class GroupController extends ApplicationController {
 			return ;
 		}
 
-		$group = PermissionGroups::findById(get_id());
+		$group = PermissionGroups::instance()->findById(get_id());
 		if(!($group instanceof PermissionGroup)) {
 			flash_error(lang('group dnx'));
 			$this->redirectTo('administration');
@@ -68,7 +68,7 @@ class GroupController extends ApplicationController {
 
 			// Module permissions
 			$module_permissions_info = array();
-			$all_modules = TabPanels::findAll(array("conditions" => "`enabled` = 1", "order" => "ordering"));
+			$all_modules = TabPanels::instance()->findAll(array("conditions" => "`enabled` = 1", "order" => "ordering"));
 			$all_modules_info = array();
 			foreach ($all_modules as $module) {
 				$all_modules_info[] = array('id' => $module->getId(), 'name' => lang($module->getTitle()), 'ot' => $module->getObjectTypeId());
@@ -99,7 +99,7 @@ class GroupController extends ApplicationController {
 				// save users
 				if ($users = array_var($_POST, 'user')) {
 					foreach ($users as $user_id => $val){
-						if ($val=='checked' && is_numeric($user_id) && (Contacts::findById($user_id) instanceof Contact)) {
+						if ($val=='checked' && is_numeric($user_id) && (Contacts::instance()->findById($user_id) instanceof Contact)) {
 							$cpg = new ContactPermissionGroup();
 							$cpg->setPermissionGroupId($pg_id);
 							$cpg->setContactId($user_id);
@@ -142,7 +142,7 @@ class GroupController extends ApplicationController {
 			return ;
 		} // if
 
-		$group = PermissionGroups::findById(get_id());
+		$group = PermissionGroups::instance()->findById(get_id());
 		if(!($group instanceof PermissionGroup)) {
 			flash_error(lang('group dnx'));
 			$this->redirectTo('administration', 'groups');
@@ -154,19 +154,19 @@ class GroupController extends ApplicationController {
 			$parameters = permission_form_parameters($pg_id);
 			
 			// Module Permissions
-			$module_permissions = TabPanelPermissions::findAll(array("conditions" => "`permission_group_id` = $pg_id"));
+			$module_permissions = TabPanelPermissions::instance()->findAll(array("conditions" => "`permission_group_id` = $pg_id"));
 			$module_permissions_info = array();
 			foreach ($module_permissions as $mp) {
 				$module_permissions_info[$mp->getTabPanelId()] = 1;
 			}
-			$all_modules = TabPanels::findAll(array("conditions" => "`enabled` = 1", "order" => "ordering"));
+			$all_modules = TabPanels::instance()->findAll(array("conditions" => "`enabled` = 1", "order" => "ordering"));
 			$all_modules_info = array();
 			foreach ($all_modules as $module) {
 				$all_modules_info[] = array('id' => $module->getId(), 'name' => lang($module->getTitle()), 'ot' => $module->getObjectTypeId());
 			}
 			
 			// System Permissions
-			$system_permissions = SystemPermissions::findById($pg_id);
+			$system_permissions = SystemPermissions::instance()->findById($pg_id);
 			
 			tpl_assign('module_permissions_info', $module_permissions_info);
 			tpl_assign('all_modules_info', $all_modules_info);
@@ -176,7 +176,7 @@ class GroupController extends ApplicationController {
 			
 			// users
 			$group_users = array();
-			$cpgs = ContactPermissionGroups::findAll(array("conditions" => "`permission_group_id` = $pg_id"));
+			$cpgs = ContactPermissionGroups::instance()->findAll(array("conditions" => "`permission_group_id` = $pg_id"));
 			foreach($cpgs as $cpg) $group_users[] = $cpg->getContactId();
 			tpl_assign('groupUserIds', $group_users);
 			tpl_assign('users', Contacts::getAllUsers());
@@ -208,10 +208,10 @@ class GroupController extends ApplicationController {
 				}
 				
 				// save users
-				ContactPermissionGroups::delete("`permission_group_id` = $pg_id");
+				ContactPermissionGroups::instance()->delete("`permission_group_id` = $pg_id");
 				if ($users = array_var($_POST, 'user')) {
 					foreach ($users as $user_id => $val){
-						if ($val=='checked' && is_numeric($user_id) && (Contacts::findById($user_id) instanceof Contact)) {
+						if ($val=='checked' && is_numeric($user_id) && (Contacts::instance()->findById($user_id) instanceof Contact)) {
 							$cpg = new ContactPermissionGroup();
 							$cpg->setPermissionGroupId($pg_id);
 							$cpg->setContactId($user_id);
@@ -253,7 +253,7 @@ class GroupController extends ApplicationController {
 			return;
 		}
 
-		$group = PermissionGroups::findById(get_id());
+		$group = PermissionGroups::instance()->findById(get_id());
 		if(!($group instanceof PermissionGroup)) {
 			flash_error(lang('group dnx'));
 			ajx_current("empty");

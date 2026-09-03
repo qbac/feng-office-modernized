@@ -180,14 +180,14 @@ class ApplicationLogs extends BaseApplicationLogs {
 				$private_filter, 
 				$silent_filter); 
 				
-			return self::findAll(array(
+			return self::instance()->findAll(array(
 				'conditions' => $conditions . $extra_conditions,
 				'order' => '`created_on` DESC',
 				'limit' => $limit,
 				'offset' => $offset,
 			)); // findAll				
 		} else {
-			$logs = self::findAll(array(
+			$logs = self::instance()->findAll(array(
 				'conditions' => array('`is_private` <= ? AND `is_silent` <= ? AND `rel_object_id` = (?) AND `is_private` <= ? AND `is_silent` <= ?
 					AND (`rel_object_id`IN (SELECT `object_id` FROM '.Comments::instance()->getTableName(true).' WHERE `rel_object_id` = (?)) 
 						OR `rel_object_id`IN (SELECT `object_id` FROM '.Timeslots::instance()->getTableName(true).' WHERE `rel_object_id` = (?))) '.$extra_conditions, $private_filter, $silent_filter, $object->getId(),$private_filter, $silent_filter, $object->getId(), $object->getId()),
@@ -212,7 +212,7 @@ class ApplicationLogs extends BaseApplicationLogs {
 			}
 			// Get more objects to substitute the removed ones
 			if ($limit && $removed > 0) {
-				$other_logs = self::findAll(array(
+				$other_logs = self::instance()->findAll(array(
 			        'conditions' => array('`is_private` <= ? AND `is_silent` <= ? AND `rel_object_id` = (?) AND `is_private` <= ? AND `is_silent` <= ? 
 			        	AND (`rel_object_id`IN (SELECT `id` FROM '.Comments::instance()->getTableName(true).' WHERE `rel_object_id` = (?)) 
 			        	AND `rel_object_id`IN (SELECT `object_id` FROM '.Timeslots::instance()->getTableName(true).' WHERE `rel_object_id` = (?)))'.$extra_conditions, $private_filter, $silent_filter, $object->getId(),$private_filter, $silent_filter, $object->getId(), $object->getId()),
@@ -304,7 +304,7 @@ class ApplicationLogs extends BaseApplicationLogs {
 		
 		$logs = array();
 		if (count($id_rows) > 0) {
-			$logs = ApplicationLogs::findAll(array("condition" => "id IN (".implode(',',$id_rows).")", "order" => "created_on DESC"));
+			$logs = ApplicationLogs::instance()->findAll(array("condition" => "id IN (".implode(',',$id_rows).")", "order" => "created_on DESC"));
 		}
 		return $logs;
 	}

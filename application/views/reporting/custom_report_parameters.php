@@ -24,7 +24,7 @@
 		</tr>
 		
 		<?php
-		$ot = ObjectTypes::findById($model);
+		$ot = ObjectTypes::instance()->findById($model);
 		$model = $ot->getHandlerClass(); 
 		foreach($conditions as $condition){
 			if($condition->getCustomPropertyId() > 0){

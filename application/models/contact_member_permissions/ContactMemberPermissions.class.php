@@ -171,7 +171,7 @@ class ContactMemberPermissions extends BaseContactMemberPermissions {
 			$gid = $contact->getPermissionGroupId ();
 			foreach ( $members as $member_id ) {
 				//new 
-				$member = Members::findById($member_id);
+				$member = Members::instance()->findById($member_id);
 				$dimension = $member->getDimension();
 				
 				$types = array();
@@ -182,22 +182,22 @@ class ContactMemberPermissions extends BaseContactMemberPermissions {
 							$types = $member_types;
 							break;
 						case 'Collaborator Customer': case 'Non-Exec Director':
-							foreach (ObjectTypes::findAll(array("conditions"=>" name NOT IN ('mail') ")) as $type) {//TODO This sucks 
+							foreach (ObjectTypes::instance()->findAll(array("conditions"=>" name NOT IN ('mail') ")) as $type) {//TODO This sucks 
 								$types[]=$type->getId();
 							}
 							break;
 						case 'Internal Collaborator':  case 'External Collaborator': 
-							foreach (ObjectTypes::findAll(array("conditions"=>" name NOT IN ('mail','contact', 'report') ")) as $type) {//TODO This sucks 
+							foreach (ObjectTypes::instance()->findAll(array("conditions"=>" name NOT IN ('mail','contact', 'report') ")) as $type) {//TODO This sucks 
 								$types[]=$type->getId();
 							}
 							break;
 						case 'Guest Customer':
-							foreach (ObjectTypes::findAll(array("conditions"=>" name IN ('message', 'weblink', 'event', 'file') ")) as $type) {//TODO This sucks 
+							foreach (ObjectTypes::instance()->findAll(array("conditions"=>" name IN ('message', 'weblink', 'event', 'file') ")) as $type) {//TODO This sucks 
 								$types[]=$type->getId();
 							}
 							break;
 						case 'Guest':
-							foreach (ObjectTypes::findAll(array("conditions"=>" name IN ('message', 'weblink', 'event') ")) as $type) {//TODO This sucks 
+							foreach (ObjectTypes::instance()->findAll(array("conditions"=>" name IN ('message', 'weblink', 'event') ")) as $type) {//TODO This sucks 
 								$types[]=$type->getId();
 							}
 							break;

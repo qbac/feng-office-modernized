@@ -14,7 +14,7 @@ class MemberCustomPropertyValues extends BaseMemberCustomPropertyValues {
 	 * @return array
 	 */
 	static function getMemberCustomPropertyValue($object_id, $custom_property_id) {
-		return self::findOne(array(
+		return self::instance()->findOne(array(
 			'conditions' => array("`member_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)
 		)); // findOne
 	} //  getMemberCustomPropertyValue
@@ -27,7 +27,7 @@ class MemberCustomPropertyValues extends BaseMemberCustomPropertyValues {
 	 * @return array
 	 */
 	static function getMemberCustomPropertyValues($object_id, $custom_property_id) {
-		return self::findAll(array(
+		return self::instance()->findAll(array(
 			'conditions' => array("`member_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)
 		)); // findAll
 	} //  getMemberCustomPropertyValue
@@ -40,7 +40,7 @@ class MemberCustomPropertyValues extends BaseMemberCustomPropertyValues {
 	 * 
 	 */
 	static function deleteMemberCustomPropertyValues($object_id, $custom_property_id) {
-		return self::delete(array("`member_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)); 
+		return self::instance()->delete(array("`member_id` = ? AND `custom_property_id` = ?", $object_id, $custom_property_id)); 
 	} //  deleteMemberCustomPropertyValues
 	
 	/**
@@ -50,7 +50,7 @@ class MemberCustomPropertyValues extends BaseMemberCustomPropertyValues {
 	 * @return array
 	 */
 	static function getMemberCustomPropertyValueCount($object) {
-		return count(self::findAll(array(
+		return count(self::instance()->findAll(array(
 			'conditions' => array("`member_id` = ? AND `custom_property_id` in (SELECT `id` FROM " . CustomProperties::instance()->getTableName(true) . " where `object_type_id` = ?)"  , $object->getObjectId(), $object->getObjectTypeId())
 		))); // findAll
 	} //  getMemberCustomPropertyValue

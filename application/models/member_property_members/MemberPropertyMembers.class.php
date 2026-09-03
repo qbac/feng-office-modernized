@@ -88,16 +88,16 @@
 			$conditions .= " AND `property_member_id` IN ($property_member_ids_csv)";
 		}
 		
-		return self::findAll(array("conditions" => $conditions));
+		return self::instance()->findAll(array("conditions" => $conditions));
     		
     }
     
     static function getAssociatedPropertiesForMember($member_id, $is_active = true) {
-    	return self::findAll(array("conditions" => "`member_id` = $member_id AND `is_active` = $is_active"));
+    	return self::instance()->findAll(array("conditions" => "`member_id` = $member_id AND `is_active` = $is_active"));
     }
     
     static function isMemberAssociated($member_id){
-    	return self::count("member_id = '$member_id' OR property_member_id = '$member_id'") > 0;
+    	return self::instance()->count("member_id = '$member_id' OR property_member_id = '$member_id'") > 0;
     }
     
   } // MemberPropertyMembers 

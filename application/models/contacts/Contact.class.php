@@ -161,7 +161,7 @@ class Contact extends BaseContact {
 		$id = $this->getId();
 		
 		// Check form linked objects
-		$linked_obj_references_count = LinkedObjects::count("`created_by_id` = $id");
+		$linked_obj_references_count = LinkedObjects::instance()->count("`created_by_id` = $id");
 		if ($linked_obj_references_count > 0){
 			return true;
 		}
@@ -257,7 +257,7 @@ class Contact extends BaseContact {
 	 * @return boolean
 	 */
 	function hasImValue() {
-		return ContactImValues::count('`contact_id` = ' . DB::escape ($this->getId()));
+		return ContactImValues::instance()->count('`contact_id` = ' . DB::escape ($this->getId()));
 	} // hasImValue
 	
 
@@ -281,7 +281,7 @@ class Contact extends BaseContact {
 	 * @return string
 	 */
 	function getImValue(ImType $im_type) {
-		$im_value = ContactImValues::findOne(array("conditions" => "`contact_id` = ".$this->getId()." AND `im_type_id` = ".$im_type->getId()));
+		$im_value = ContactImValues::instance()->findOne(array("conditions" => "`contact_id` = ".$this->getId()." AND `im_type_id` = ".$im_type->getId()));
 		return $im_value instanceof ContactImValue && (trim($im_value->getValue()) != '') ? $im_value->getValue() : null;
 	} // getImValue
 	
@@ -366,7 +366,7 @@ class Contact extends BaseContact {
 	 */
 	function getCompany() {
 		if(is_null($this->company)) {
-			$this->company = Contacts::findById($this->getCompanyId());
+			$this->company = Contacts::instance()->findById($this->getCompanyId());
 		}
 		return $this->company;
 	} // getCompany
@@ -475,11 +475,11 @@ class Contact extends BaseContact {
 	 
 	 
 	 function getNonMainEmails() {
-	 	return ContactEmails::findAll(array('conditions' => 'is_main=0 AND contact_id = '.$this->getId()));
+	 	return ContactEmails::instance()->findAll(array('conditions' => 'is_main=0 AND contact_id = '.$this->getId()));
 	 }
 	 
 	 function getMainEmails() {
-	 	return ContactEmails::findAll(array('conditions' => 'is_main=1 AND contact_id = '.$this->getId()));
+	 	return ContactEmails::instance()->findAll(array('conditions' => 'is_main=1 AND contact_id = '.$this->getId()));
 	 }
 	 
 
@@ -494,7 +494,7 @@ class Contact extends BaseContact {
 	 */
 	function getAddress($type) {
 		$address_type_id = AddressTypes::getAddressTypeId($type);
-		return ContactAddresses::findOne(array('conditions' => array("`contact_id` = ? AND `address_type_id` = ?", $this->getId(), $address_type_id)));
+		return ContactAddresses::instance()->findOne(array('conditions' => array("`contact_id` = ? AND `address_type_id` = ?", $this->getId(), $address_type_id)));
 	} // getMainPhone
 
 	/**
@@ -507,7 +507,7 @@ class Contact extends BaseContact {
 	 */
 	function getStringAddress($type) {
 		$address_type_id = AddressTypes::getAddressTypeId($type);
-		$address = ContactAddresses::findOne(array('conditions' => array("`contact_id` = ? AND `address_type_id` = ?", $this->getId(), $address_type_id)));
+		$address = ContactAddresses::instance()->findOne(array('conditions' => array("`contact_id` = ? AND `address_type_id` = ?", $this->getId(), $address_type_id)));
 
 		if (!$address instanceof ContactAddress) return "";
 
@@ -540,7 +540,7 @@ class Contact extends BaseContact {
 			$is_main_cond = "true";
 		}
 		$telephone_type_id = TelephoneTypes::getTelephoneTypeId($type);
-		return ContactTelephones::findOne(array('conditions' => array("$is_main_cond AND `contact_id` = ? AND 
+		return ContactTelephones::instance()->findOne(array('conditions' => array("$is_main_cond AND `contact_id` = ? AND 
 		`telephone_type_id` = ?", $this->getId(), $telephone_type_id)));
 	} // getFaxPhone	
 	
@@ -549,21 +549,21 @@ class Contact extends BaseContact {
 		if ($type != '') {
 			$type_cond = " AND telephone_type_id = (SELECT id FROM ".TABLE_PREFIX."telephone_types WHERE name='$type')";
 		}
-		return ContactTelephones::findAll(array('conditions' => array("`contact_id` = ? $type_cond" ,$this->getId())));
+		return ContactTelephones::instance()->findAll(array('conditions' => array("`contact_id` = ? $type_cond" ,$this->getId())));
 		
 	} // getAllPhones
 	
 	function getAllEmails() {
-		return ContactEmails::findAll(array('conditions' => array("`contact_id` = ?" ,$this->getId())));
+		return ContactEmails::instance()->findAll(array('conditions' => array("`contact_id` = ?" ,$this->getId())));
 	
 	} // getAllEmails
 	
 	function getAllWebpages() {		
-		return ContactWebpages::findAll(array('conditions' => array("`contact_id` = ?",	$this->getId())));
+		return ContactWebpages::instance()->findAll(array('conditions' => array("`contact_id` = ?",	$this->getId())));
 	} // getAllWebpages
 	
 	function getAllAddresses() {
-		return ContactAddresses::findAll(array('conditions' => array("`contact_id` = ?", $this->getId())));
+		return ContactAddresses::instance()->findAll(array('conditions' => array("`contact_id` = ?", $this->getId())));
 	} // getAllAddress
 	/**
 	 * Return personal fax phone for this contact.
@@ -598,7 +598,7 @@ class Contact extends BaseContact {
 	 */
 	function getWebpage($type) {
 		$webpage_type_id = WebpageTypes::getWebpageTypeId($type);
-		return ContactWebpages::findOne(array('conditions' => array("`contact_id` = ? AND `web_type_id` = ?", 
+		return ContactWebpages::instance()->findOne(array('conditions' => array("`contact_id` = ? AND `web_type_id` = ?", 
     		   $this->getId(), $webpage_type_id)));
 	} // getWebpage	
 	
@@ -747,7 +747,7 @@ class Contact extends BaseContact {
 	 * @return array
 	 */
 	function getContactsByCompany() {
-		return Contacts::findAll(array(
+		return Contacts::instance()->findAll(array(
 			'conditions' => '`company_id` = ' . $this->getId(). ' AND `user_type` = 0 AND `disabled` = 0 AND trashed_by_id=0', 
 			'order' => '`first_name` ASC, `surname` ASC'
 		)); // findAll
@@ -762,7 +762,7 @@ class Contact extends BaseContact {
 	 */
 	function getUsersByCompany() {
 		if ($this->company_users == null) {
-			$this->company_users = Contacts::findAll(array('conditions' => '`user_type` <> 0 AND `company_id` = ' . $this->getId(), 'order' => '`first_name` ASC, `surname` ASC'));
+			$this->company_users = Contacts::instance()->findAll(array('conditions' => '`user_type` <> 0 AND `company_id` = ' . $this->getId(), 'order' => '`first_name` ASC, `surname` ASC'));
 		}
 		return $this->company_users;
 	} // getContactsByCompany
@@ -1318,7 +1318,7 @@ class Contact extends BaseContact {
     	$type = parent::getUserType();
     	if (!$type) return false;
     	if (!array_var(self::$pg_cache, $type)) {
-    		$pg = PermissionGroups::findById($type);
+    		$pg = PermissionGroups::instance()->findById($type);
     		self::$pg_cache[$type] = $pg;
     	} else {
     		$pg = array_var(self::$pg_cache, $type);
@@ -1331,7 +1331,7 @@ class Contact extends BaseContact {
     	$type = $this->getUserType();
     	if (!$type) return false;
     	if (!array_var(self::$pg_cache, $type)) {
-    		$pg = PermissionGroups::findById($type);
+    		$pg = PermissionGroups::instance()->findById($type);
     		self::$pg_cache[$type] = $pg;
     	} else {
     		$pg = array_var(self::$pg_cache, $type);
@@ -1344,7 +1344,7 @@ class Contact extends BaseContact {
     	$type = $this->getUserType();
     	if (!$type) return false;
     	if (!array_var(self::$pg_cache, $type)) {
-    		$pg = PermissionGroups::findById($type);
+    		$pg = PermissionGroups::instance()->findById($type);
     		self::$pg_cache[$type] = $pg;
     	} else {
     		$pg = array_var(self::$pg_cache, $type);
@@ -1357,7 +1357,7 @@ class Contact extends BaseContact {
     	$type = $this->getUserType();
     	if (!$type) return false;
     	if (!array_var(self::$pg_cache, $type)) {
-    		$pg = PermissionGroups::findById($type);
+    		$pg = PermissionGroups::instance()->findById($type);
     		self::$pg_cache[$type] = $pg;
     	} else {
     		$pg = array_var(self::$pg_cache, $type);
@@ -1382,7 +1382,7 @@ class Contact extends BaseContact {
     	$type = $this->getUserType();
     	if (!$type) return null;
     	if (!array_var(self::$pg_cache, $type)) {
-    		$pg = PermissionGroups::findById($type);
+    		$pg = PermissionGroups::instance()->findById($type);
     		self::$pg_cache[$type] = $pg;
     	} else {
     		$pg = array_var(self::$pg_cache, $type);
@@ -1403,7 +1403,7 @@ class Contact extends BaseContact {
     function hasEmailAccounts() {
     	$mail_plugin_enabled = Plugins::instance()->isActivePlugin('mail');
     	if ($mail_plugin_enabled) {
-	    	$accounts = MailAccountContacts::find(array('conditions' => '`contact_id` = '.$this->getId()));
+	    	$accounts = MailAccountContacts::instance()->find(array('conditions' => '`contact_id` = '.$this->getId()));
 	    	return is_array($accounts) && count($accounts) > 0;
     	}
     }    
@@ -1931,7 +1931,7 @@ class Contact extends BaseContact {
 	 * @return array
 	 */
 	function getClientCompanies() {
-		return Contacts::findAll(array('conditions' => '`object_id` <> 1 AND `is_company` = 1'));
+		return Contacts::instance()->findAll(array('conditions' => '`object_id` <> 1 AND `is_company` = 1'));
 	} // getClientCompanies
 	
 
@@ -1955,7 +1955,7 @@ class Contact extends BaseContact {
 	 * @return integer
 	 */
 	function countUsers() {
-		return Contacts::count('`company_id` = ' . DB::escape($this->getId()));
+		return Contacts::instance()->count('`company_id` = ' . DB::escape($this->getId()));
 	} // countUsers
 	
 	/**

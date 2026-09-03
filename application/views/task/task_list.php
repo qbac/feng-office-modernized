@@ -20,7 +20,7 @@ $description = "";
 
 		
 <?php if ($task_list->getObjectSubtype() > 0) {
-		$subType = ProjectCoTypes::findById($task_list->getObjectSubtype());
+		$subType = ProjectCoTypes::instance()->findById($task_list->getObjectSubtype());
 		if ($subType instanceOf ProjectCoType ) {
 			echo "<div><span class='bold'>" . lang('object type') . ":</span> " . $subType->getName() . "</div>";
 		}

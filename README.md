@@ -9,7 +9,7 @@ zobacz **`CLAUDE.md`**.
 
 ## Wymagania
 
-- Laragon z PHP **7.4.x** (na start — patrz "Dlaczego PHP 7.4, a nie 8.4" niżej) i MySQL 8.x
+- Laragon z PHP **8.4.x** (działa end-to-end od 2026-09-03, patrz "Status" niżej) i MySQL 8.x
 - Rozszerzenia PHP: `pdo_mysql`, `mbstring`, `gd`, `curl`, `zip`, `openssl`, `bcmath` (opcjonalnie, dla `BenchmarkTimer`)
 
 ## Setup od zera
@@ -46,21 +46,24 @@ zobacz **`CLAUDE.md`**.
 
 4. **Otwórz** `http://fo.local` w przeglądarce.
 
-## Status: PHP 7.4 działa, PHP 8.4 prawie
+## Status: PHP 8.4 działa end-to-end
 
-**PHP 7.4 + MySQL 8.4: potwierdzone działające end-to-end** (strona logowania renderuje się
-poprawnie). Naprawiono po drodze kilka realnych bugów w kodzie (nie tylko kosmetycznych) —
-duplikaty nazw parametrów, zarezerwowaną nazwę klasy `Object`, `continue` poza pętlą, twarde
-ścieżki produkcyjne w cache autoloadera. Pełna lista w `CLAUDE.md`.
+**PHP 8.4.12 + MySQL 8.4: potwierdzone działające end-to-end** — zweryfikowane przez prawdziwe
+żądanie HTTP do Apache (`curl http://fo.local/index.php?c=access&a=login` → 200 OK, pełny HTML
+strony logowania po polsku; `curl http://fo.local/index.php` → poprawny redirect 302).
 
-**PHP 8.4: prawie działa** — cały kod przechodzi `php -l` bez błędów składni, żądanie dochodzi aż
-do renderowania widoku logowania (widać to w `cache/log.php`), ale finalna odpowiedź HTTP wraca
-pusta (200 OK, 0 bajtów). Przyczyna nieustalona — do zbadania w kolejnej sesji, szczegóły i
-hipotezy w `CLAUDE.md` sekcja "Otwarty problem". Prawdopodobny winowajca: masowe wywoływanie
-niestatycznych metod statycznie (deprecated w PHP 8, ale wciąż powinno działać przez fallback).
+Po drodze naprawiono sporo realnych bugów w kodzie (nie tylko kosmetycznych) — duplikaty nazw
+parametrów, zarezerwowaną nazwę klasy `Object`, `continue` poza pętlą, twarde ścieżki produkcyjne
+w cache autoloadera, a przede wszystkim **cały wzorzec "non-static method called statically"**,
+który w PHP 8.0+ jest fatalnym błędem (nie deprecation jak w 7.x) i cicho zabijał request bez
+żadnego śladu w logach. Pełna lista w `CLAUDE.md` i `CHANGELOG.md` (wpis `2026-09-03`).
 
-Żeby przełączyć wersję PHP używaną przez Laragon dla Apache: Laragon → prawy klik na "PHP" w
-menu → wybór wersji (`7.4.33` na razie, `8.4.12` do dalszego debugowania).
+Znany drobny problem: `http://fo.local/` (bez `index.php`) serwuje pusty statyczny plik zamiast
+przechodzić przez PHP — patrz `CLAUDE.md`.
+
+Żeby przełączyć wersję PHP używaną przez Laragon dla Apache przez CLI/dev-server: Laragon → prawy
+klik na "PHP" w menu → wybór wersji. Apache (przez `mod_fcgid`) ma wersję PHP 8.4.12 wpisaną na
+sztywno w `C:\laragon\etc\apache2\fcgid.conf` niezależnie od wyboru w menu Laragon.
 
 ## Dane, które NIE są w gicie
 

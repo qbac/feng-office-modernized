@@ -27,7 +27,7 @@ class ProjectForm extends BaseProjectForm {
 	function getInObject() {
 		if(is_null($this->in_object)) {
 			if($this->getAction() == self::ADD_COMMENT_ACTION) {
-				$this->in_object = ProjectMessages::findById($this->getInObjectId());
+				$this->in_object = ProjectMessages::instance()->findById($this->getInObjectId());
 			} elseif($this->getAction() == self::ADD_TASK_ACTION) {
 				$this->in_object = Projects::findById($this->getInObjectId());
 			} // if

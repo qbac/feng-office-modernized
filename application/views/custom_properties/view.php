@@ -28,7 +28,7 @@
 					$title = '';
 					$style = '';
 					if ($customProp->getType() == 'contact'){
-						$c = Contacts::findById($value);
+						$c = Contacts::instance()->findById($value);
 						$htmlValue = '<div class="db-ico ico-contact" style="padding-left:18px;width:100%;">'.clean($c->getObjectName()).'</div>';
 					} else if ($customProp->getType() == 'boolean'){
 						$htmlValue = '<div class="db-ico ico-'.($value?'complete':'delete').' '.($value?'cpbooltrue':'cpboolfalse').'">&nbsp;</div>';

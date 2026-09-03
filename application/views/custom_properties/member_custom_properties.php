@@ -1,7 +1,7 @@
 <?php
 require_javascript("og/CustomProperties.js");
 
-$ot = ObjectTypes::findById($member->getObjectTypeId());
+$ot = ObjectTypes::instance()->findById($member->getObjectTypeId());
 if ($ot->getName()=='project_folder' || $ot->getName()=='customer_folder') {
 	$ot = ObjectTypes::findByName('folder');
 }
@@ -201,7 +201,7 @@ if(count($cps) > 0){
 					$cp_value = MemberCustomPropertyValues::getMemberCustomPropertyValue($member->getId(), $customProp->getId());
 					if ($cp_value instanceof MemberCustomPropertyValue && is_numeric($cp_value->getValue())) {
 						$value = $cp_value->getValue();
-						$contact = Contacts::findById($value);
+						$contact = Contacts::instance()->findById($value);
 					}
 					
 					Hook::fire('member_contact_cp_filters', array('cp' => $customProp, 'member' => $member), $filters);

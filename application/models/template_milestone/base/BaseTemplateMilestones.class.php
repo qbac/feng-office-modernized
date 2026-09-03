@@ -49,7 +49,7 @@ abstract class BaseTemplateMilestones extends ContentDataObjects {
 	 * @param void
 	 * @return array
 	 */
-	function getColumns() {
+	static function getColumns() {
 		return array_keys(self::$columns);
 	} // getColumns
 
@@ -277,13 +277,13 @@ abstract class BaseTemplateMilestones extends ContentDataObjects {
 	 * @param integer $current_page Current page number
 	 * @return array
 	 */
-	function paginate($arguments = null, $items_per_page = 10, $current_page = 1) {
+	function paginate($arguments = null, $items_per_page = 10, $current_page = 1, $count = null) {
 		if(isset($this) && instance_of($this, 'TemplateMilestones')) {
-			return parent::paginate($arguments, $items_per_page, $current_page);
+			return parent::paginate($arguments, $items_per_page, $current_page, $count);
 		} else {
-			return TemplateMilestones::instance()->paginate($arguments, $items_per_page, $current_page);
+			return TemplateMilestones::instance()->paginate($arguments, $items_per_page, $current_page, $count);
 			//$instance =& TemplateMilestones::instance();
-			//return $instance->paginate($arguments, $items_per_page, $current_page);
+			//return $instance->paginate($arguments, $items_per_page, $current_page, $count);
 		} // if
 	} // paginate
 
@@ -292,7 +292,7 @@ abstract class BaseTemplateMilestones extends ContentDataObjects {
 	 *
 	 * @return TemplateMilestones
 	 */
-	function instance() {
+	static function instance() {
 		static $instance;
 		if(!instance_of($instance, 'TemplateMilestones')) {
 			$instance = new TemplateMilestones();

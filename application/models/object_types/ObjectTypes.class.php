@@ -20,7 +20,7 @@
   	 * @param unknown_type $external_conditions
   	 */
 	static function getAvailableObjectTypes($external_conditions = "") {
-		$object_types = self::findAll(array(
+		$object_types = self::instance()->findAll(array(
 			"conditions" => "`type` = 'content_object' AND 
 			`name` <> 'file revision' AND name <> 'template_task' AND name <> 'template_milestone'  AND 
 			IF(plugin_id IS NULL OR plugin_id=0, true, (SELECT p.is_activated FROM ".TABLE_PREFIX."plugins p WHERE p.id=plugin_id) = true) AND
@@ -33,7 +33,7 @@
   	 * @param unknown_type $external_conditions
   	 */
 	static function getAvailableObjectTypesWithTimeslots($external_conditions = "") {
-		$object_types = self::findAll(array(
+		$object_types = self::instance()->findAll(array(
 			"conditions" => "`type` IN ('content_object', 'located') AND 
 			`name` <> 'file revision' AND name <> 'template_task' AND name <> 'template_milestone'  AND 
 			IF(plugin_id IS NULL OR plugin_id=0, true, (SELECT p.is_activated FROM ".TABLE_PREFIX."plugins p WHERE p.id=plugin_id) = true) AND
@@ -74,7 +74,7 @@
 		$ot = array_var(self::$object_types_by_name, $name);
 		if (!$ot instanceof ObjectType) {
 			// cache all object types, they are very few
-			$ots = self::findAll();
+			$ots = self::instance()->findAll();
 			foreach ($ots as $ot) {
 				self::$object_types_by_name[$ot->getName()] = $ot;
 			}
@@ -88,7 +88,7 @@
 			$ot = array_var(self::$object_types_by_id, $id);
 			if (!$ot instanceof ObjectType) {
 				// cache all object types, they are very few
-				$ots = self::findAll();
+				$ots = self::instance()->findAll();
 				foreach ($ots as $ot) {
 					self::$object_types_by_id[$ot->getId()] = $ot;
 				}

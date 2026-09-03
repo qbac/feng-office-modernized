@@ -3,7 +3,7 @@
 class ContactMemberCaches extends BaseContactMemberCaches {
 	
 	static function getContactMemberCacheById($id) {
-		$m = ContactMemberCaches::findById($id);
+		$m = ContactMemberCaches::instance()->findById($id);
 		return $m;
 	}
 	

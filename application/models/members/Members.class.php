@@ -8,7 +8,7 @@
   class Members extends BaseMembers {
     
 	static function getSubmembers(Member $member, $recursive = true, $extra_conditions="") {
-		$members = Members::findAll(array('conditions' => '`parent_member_id` = ' . $member->getId() .' '. $extra_conditions));
+		$members = Members::instance()->findAll(array('conditions' => '`parent_member_id` = ' . $member->getId() .' '. $extra_conditions));
 		if ($recursive) {
 	  		foreach ($members as $m) {
 	  			$members = array_merge($members, self::getSubmembers($m, $recursive));
@@ -18,7 +18,7 @@
 	}
 	
 	static function getByDimensionObjType($dimension_id, $object_type_id) {
-		return Members::findAll(array("conditions" => array("`dimension_id` = ? AND `object_type_id` = ?", $dimension_id, $object_type_id)));
+		return Members::instance()->findAll(array("conditions" => array("`dimension_id` = ? AND `object_type_id` = ?", $dimension_id, $object_type_id)));
 	}
 	
 	/**
@@ -32,7 +32,7 @@
 		if (!is_null($dimension_id)) {
 			$conditions .= " AND dimension_id = $dimension_id "; 
 		}		
-		return self::findAll(array("conditions" => array($conditions) ));
+		return self::instance()->findAll(array("conditions" => array($conditions) ));
 	}	
 	
 	/**
@@ -53,7 +53,7 @@
 	static function getMemberById($id) {
 		$m = array_var(self::$members_cache, $id);
 		if (!$m instanceof Member) {
-			$m = Members::findById($id);
+			$m = Members::instance()->findById($id);
 			if ($m instanceof Member) {
 				self::$members_cache[$id] = $m;
 			}

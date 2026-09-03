@@ -23,7 +23,7 @@ class Timeslots extends BaseTimeslots {
 		if ($user)
 			$userCondition = ' AND `contact_id` = '. $user->getId();
 
-		return self::findAll(array(
+		return self::instance()->findAll(array(
           'conditions' => array('`rel_object_id` = ?' . $userCondition, $object->getObjectId()),
           'order' => '`e`.`start_time`'
           ));
@@ -35,7 +35,7 @@ class Timeslots extends BaseTimeslots {
 		if ($user)
 			$userCondition = ' AND `user_id` = '. $user->getId();
 
-		return self::findOne(array(
+		return self::instance()->findOne(array(
           'conditions' => array('`rel_object_id` = ? AND `end_time`= ? ' . $userCondition, $object->getObjectId(), EMPTY_DATETIME), 
           'order' => '`e`.`start_time`'
           ));
@@ -47,7 +47,7 @@ class Timeslots extends BaseTimeslots {
 	function getOpenTimeslotsByObject($object_id) {
 		if ($this->cached_timeslots == null) {
 			$this->cached_timeslots = array();
-			$cached_ts = self::findAll(array('conditions' => array('`end_time`= ? ', EMPTY_DATETIME), 'order' => 'start_time'));
+			$cached_ts = self::instance()->findAll(array('conditions' => array('`end_time`= ? ', EMPTY_DATETIME), 'order' => 'start_time'));
 			foreach ($cached_ts as $ct) {
 				if (!isset($this->cached_timeslots[$ct->getRelObjectId()])) $this->cached_timeslots[$ct->getRelObjectId()] = array();
 				$this->cached_timeslots[$ct->getRelObjectId()][] = $ct;
@@ -67,7 +67,7 @@ class Timeslots extends BaseTimeslots {
 		if ($user)
 			$userCondition = ' AND `contact_id` = '. $user->getId();
 
-		return self::count(array('`rel_object_id` = ? ' . $userCondition, $object->getObjectId()));
+		return self::instance()->count(array('`rel_object_id` = ? ' . $userCondition, $object->getObjectId()));
 	} // countTimeslotsByObject
 
 	/**
@@ -77,7 +77,7 @@ class Timeslots extends BaseTimeslots {
 	 * @return boolean
 	 */
 	static function dropTimeslotsByObject(ContentDataObject $object) {
-		$timeslots = self::findAll(array('conditions' => array('`rel_object_id` = ?', $object->getObjectId())));
+		$timeslots = self::instance()->findAll(array('conditions' => array('`rel_object_id` = ?', $object->getObjectId())));
 		foreach ($timeslots as $timeslot) {
 			$timeslot->delete();
 		}
@@ -146,7 +146,7 @@ class Timeslots extends BaseTimeslots {
 	 * @return unknown_type
 	 */
 	static function updateBillingValues() {
-		$timeslots = Timeslots::findAll(array(
+		$timeslots = Timeslots::instance()->findAll(array(
 			'conditions' => '`end_time` > 0 AND billing_id = 0 AND is_fixed_billing = 0',
 		));
 		
@@ -171,7 +171,7 @@ class Timeslots extends BaseTimeslots {
 					
 					$billing_category = array_var($categories_cache, $billing_category_id);
 					if (!$billing_category instanceof BillingCategory) {
-						$billing_category = BillingCategories::findById($billing_category_id);
+						$billing_category = BillingCategories::instance()->findById($billing_category_id);
 						$categories_cache[$billing_category_id] = $billing_category;
 					}
 					
@@ -217,7 +217,7 @@ class Timeslots extends BaseTimeslots {
 		if ($object_id > 0)
 			$objectCondition = ' AND `rel_object_id` = ' . $object_id;
 		
-		return self::findAll(array(
+		return self::instance()->findAll(array(
           'conditions' => array('`start_time` > ? and `end_time` < ?' . $userCondition . $projectCondition . $permissions . $objectCondition, $start_date, $end_date),
           'order' => '`start_time`'
         ));

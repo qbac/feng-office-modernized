@@ -135,7 +135,7 @@ class MessageController extends ApplicationController {
 				$succ = 0; $err = 0;
 				for($i = 0; $i < count($attributes["ids"]); $i++){
 					$id = $attributes["ids"][$i];
-					$message = ProjectMessages::findById($id);
+					$message = ProjectMessages::instance()->findById($id);
 					if (isset($message) && $message->canDelete(logged_user())){
 						try{
 							DB::beginWork();
@@ -162,7 +162,7 @@ class MessageController extends ApplicationController {
 				$succ = 0; $err = 0;
 				for($i = 0; $i < count($attributes["ids"]); $i++){
 					$id = $attributes["ids"][$i];
-					$message = ProjectMessages::findById($id);
+					$message = ProjectMessages::instance()->findById($id);
 					try {
 						$message->setIsRead(logged_user()->getId(),true);						
 						$succ++;
@@ -179,7 +179,7 @@ class MessageController extends ApplicationController {
 				$succ = 0; $err = 0;
 				for($i = 0; $i < count($attributes["ids"]); $i++){
 					$id = $attributes["ids"][$i];
-					$message = ProjectMessages::findById($id);
+					$message = ProjectMessages::instance()->findById($id);
 					try {
 						$message->setIsRead(logged_user()->getId(),false);						
 						$succ++;
@@ -196,7 +196,7 @@ class MessageController extends ApplicationController {
 				$succ = 0; $err = 0;
 				for($i = 0; $i < count($attributes["ids"]); $i++){
 					$id = $attributes["ids"][$i];
-					$message = ProjectMessages::findById($id);
+					$message = ProjectMessages::instance()->findById($id);
 					if (isset($message) && $message->canEdit(logged_user())){
 						try{
 							DB::beginWork();
@@ -270,7 +270,7 @@ class MessageController extends ApplicationController {
 					foreach ($custom_properties as $cp) {
 						$cp_value = CustomPropertyValues::getCustomPropertyValue($msg->getId(), $cp->getId());
 						if ($cp->getType() == 'contact' && $cp_value instanceof CustomPropertyValue) {
-							$contact = Contacts::findById($cp_value->getValue());
+							$contact = Contacts::instance()->findById($cp_value->getValue());
 							if ($contact instanceof Contact) $cp_value->setValue($contact->getObjectName());
 						}
 						$object["messages"][$i]['cp_'.$cp->getId()] = $cp_value instanceof CustomPropertyValue ? $cp_value->getValue() : '';
@@ -302,7 +302,7 @@ class MessageController extends ApplicationController {
 	function view() {
 		$this->addHelper('textile');
 
-		$message = ProjectMessages::findById(get_id());
+		$message = ProjectMessages::instance()->findById(get_id());
 		if(!($message instanceof ProjectMessage)) {
 			flash_error(lang('message dnx'));
 			ajx_current("empty");
@@ -335,7 +335,7 @@ class MessageController extends ApplicationController {
 		$this->setLayout("html");
 		$this->addHelper('textile');
 		
-		$message = ProjectMessages::findById(get_id());
+		$message = ProjectMessages::instance()->findById(get_id());
 		if(!($message instanceof ProjectMessage)) {
 			flash_error(lang('message dnx'));
 			ajx_current("empty");
@@ -459,7 +459,7 @@ class MessageController extends ApplicationController {
 			return;
 		}
 
-		$message = ProjectMessages::findById(get_id());
+		$message = ProjectMessages::instance()->findById(get_id());
 		if(!($message instanceof ProjectMessage)) {
 			flash_error(lang('message dnx'));
 			ajx_current("empty");
@@ -505,7 +505,7 @@ class MessageController extends ApplicationController {
 				if (array_var($_POST,'merge-changes') == 'true')
 				{
 					$this->setTemplate('view');
-					$edited_note = ProjectMessages::findById($message->getId());
+					$edited_note = ProjectMessages::instance()->findById($message->getId());
 					tpl_assign('message', $edited_note);
 					tpl_assign('subscribers', $edited_note->getSubscribers());
 					ajx_extra_data(array("name" => $edited_note->getObjectName(), 'icon'=>'ico-message'));
@@ -569,7 +569,7 @@ class MessageController extends ApplicationController {
 		}
 		
 		ajx_current("empty");
-		$message = ProjectMessages::findById(get_id());
+		$message = ProjectMessages::instance()->findById(get_id());
 		if(!($message instanceof ProjectMessage)) {
 			flash_error(lang('message dnx'));
 			ajx_current("empty");

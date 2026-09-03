@@ -110,7 +110,7 @@ class ReportingController extends ApplicationController {
 			ajx_current("empty");
 			return;
 		}
-		$chart = ProjectCharts::findById(get_id());
+		$chart = ProjectCharts::instance()->findById(get_id());
 		if(!($chart instanceof ProjectChart)) {
 			flash_error(lang('chart dnx'));
 			ajx_current("empty");
@@ -209,7 +209,7 @@ class ReportingController extends ApplicationController {
 		$_SESSION['total_task_times_report_data'] = $report_data;
 		tpl_assign('report_data', $report_data);
 		tpl_assign('users', $users);
-		tpl_assign('has_billing', BillingCategories::count() > 0);
+		tpl_assign('has_billing', BillingCategories::instance()->count() > 0);
 	}
 	
 	function total_task_times_print(){
@@ -287,7 +287,7 @@ class ReportingController extends ApplicationController {
 			}
 		}
 	
-		$user = Contacts::findById(array_var($report_data, 'user'));
+		$user = Contacts::instance()->findById(array_var($report_data, 'user'));
 		
 		$now = DateTimeValueLib::now();
 		$now->advance(logged_user()->getTimezone()*3600, true);
@@ -425,7 +425,7 @@ class ReportingController extends ApplicationController {
 	function total_task_times_by_task_print(){
 		$this->setLayout("html");
 
-		$task = ProjectTasks::findById(get_id());
+		$task = ProjectTasks::instance()->findById(get_id());
 
 		$st = DateTimeValueLib::make(0,0,0,1,1,1900);
 		$et = DateTimeValueLib::make(23,59,59,12,31,2036);
@@ -678,7 +678,7 @@ class ReportingController extends ApplicationController {
 					$newCondition->setIsParametrizable(isset($condition['is_parametrizable']));
 					$newCondition->save();
 				}
-				ReportColumns::delete('report_id = ' . $report_id);
+				ReportColumns::instance()->delete('report_id = ' . $report_id);
 				$columns = array_var($_POST, 'columns');
 				
 				asort($columns); //sort the array by column order
@@ -768,7 +768,7 @@ class ReportingController extends ApplicationController {
 				}
 			}
 			
-			$ot = ObjectTypes::findById($report->getReportObjectTypeId());
+			$ot = ObjectTypes::instance()->findById($report->getReportObjectTypeId());
 			eval('$managerInstance = ' . $ot->getHandlerClass() . "::instance();");
 			$externalCols = $managerInstance->getExternalColumns();
 			$externalFields = array();
@@ -815,7 +815,7 @@ class ReportingController extends ApplicationController {
 				tpl_assign('pagination', $results['pagination']);
 				tpl_assign('types', self::get_report_column_types($report_id));
 				tpl_assign('post', $_REQUEST);
-				$ot = ObjectTypes::findById($report->getReportObjectTypeId());
+				$ot = ObjectTypes::instance()->findById($report->getReportObjectTypeId());
 				tpl_assign('model', $ot->getHandlerClass());
 				tpl_assign('description', $report->getDescription());
 				tpl_assign('conditions', $conditions);
@@ -858,7 +858,7 @@ class ReportingController extends ApplicationController {
 			tpl_assign('types', self::get_report_column_types($report_id));
 			tpl_assign('template_name', 'view_custom_report');
 			tpl_assign('title', $report->getObjectName());
-			$ot = ObjectTypes::findById($report->getReportObjectTypeId());
+			$ot = ObjectTypes::instance()->findById($report->getReportObjectTypeId());
 			tpl_assign('model', $ot->getHandlerClass());
 			tpl_assign('description', $report->getDescription());
 			$conditions = ReportConditions::getAllReportConditions($report_id);
@@ -913,7 +913,7 @@ class ReportingController extends ApplicationController {
 	function generateCSVReport($report, $results){
 		$contents = "";
 		
-		$ot = ObjectTypes::findById($report->getReportObjectTypeId());
+		$ot = ObjectTypes::instance()->findById($report->getReportObjectTypeId());
 		Hook::fire("report_header", $ot, $results['columns']);
 		
 		$types = self::get_report_column_types($report->getId());
@@ -945,7 +945,7 @@ class ReportingController extends ApplicationController {
 	function generatePDFReport(Report $report, $results){
 		
 		$types = self::get_report_column_types($report->getId());
-		$ot = ObjectTypes::findById($report->getReportObjectTypeId());
+		$ot = ObjectTypes::instance()->findById($report->getReportObjectTypeId());
 		eval('$managerInstance = ' . $ot->getHandlerClass() . "::instance();");
 		$externalCols = $managerInstance->getExternalColumns();
 		$filename = str_replace(' ', '_',$report->getObjectName()).date('_YmdHis');
@@ -1239,7 +1239,7 @@ class ReportingController extends ApplicationController {
 				if ($cp->getType() != 'table')
 					$fields[] = array('id' => $cp->getId(), 'name' => $cp->getName(), 'type' => $cp->getType(), 'values' => $cp->getValues(), 'multiple' => $cp->getIsMultipleValues());
 			}
-			$ot = ObjectTypes::findById($object_type);
+			$ot = ObjectTypes::instance()->findById($object_type);
 			eval('$managerInstance = ' . $ot->getHandlerClass() . "::instance();");
 			
 			if ($include_common_cols) {
@@ -1330,12 +1330,12 @@ class ReportingController extends ApplicationController {
 				$values[] = array('id' => $milestone->getId(), 'name' => $milestone->getObjectName());
 			}
 		/*} else if($field == 'object_subtype'){
-			$object_types = ProjectCoTypes::findAll(array('conditions' => (!is_null($manager) ? "`object_manager`='$manager'" : "")));
+			$object_types = ProjectCoTypes::instance()->findAll(array('conditions' => (!is_null($manager) ? "`object_manager`='$manager'" : "")));
 			foreach($object_types as $object_type){
 				$values[] = array('id' => $object_type->getId(), 'name' => $object_type->getName());
 			}*/
 		} else if ($field == 'company_id') {
-			$companies = Contacts::findAll(array('conditions' => 'is_company > 0'));
+			$companies = Contacts::instance()->findAll(array('conditions' => 'is_company > 0'));
 			foreach ($companies as $comp) {
 				$values[] = array('id' => $comp->getId(), 'name' => $comp->getObjectName());
 			}
@@ -1355,7 +1355,7 @@ class ReportingController extends ApplicationController {
 				$fields[] = array('id' => $cp->getId(), 'name' => $cp->getName(), 'type' => $cp->getType(), 'values' => $cp->getValues(), 'multiple' => $cp->getIsMultipleValues());
 			}
 			
-			$ot = ObjectTypes::findById($object_type);
+			$ot = ObjectTypes::instance()->findById($object_type);
 			eval('$managerInstance = ' . $ot->getHandlerClass() . "::instance();");
 			$objectColumns = $managerInstance->getColumns();
 			
@@ -1425,7 +1425,7 @@ class ReportingController extends ApplicationController {
 	private function get_report_column_types($report_id) {
 		$col_types = array();
 		$report = Reports::getReport($report_id);
-		$ot = ObjectTypes::findById($report->getReportObjectTypeId());
+		$ot = ObjectTypes::instance()->findById($report->getReportObjectTypeId());
 		$model = $ot->getHandlerClass();
 		$manager = new $model();
 

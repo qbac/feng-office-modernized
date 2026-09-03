@@ -18,21 +18,21 @@ class ProjectEvents extends BaseProjectEvents {
 	const ORDER_BY_MODIFYTIME = 'dateUpdated';
         
         function findBySpecialId($special_id) {
-                return ProjectEvents::findOne(array('conditions' => array('`special_id` = ? AND trashed_on =\''.EMPTY_DATETIME.'\' AND trashed_by_id = 0', $special_id)));
+                return ProjectEvents::instance()->findOne(array('conditions' => array('`special_id` = ? AND trashed_on =\''.EMPTY_DATETIME.'\' AND trashed_by_id = 0', $special_id)));
         }
         
         function findByExtCalId($ext_cal_id) {
-                return ProjectEvents::findAll(array('conditions' => array('`ext_cal_id` = ?', $ext_cal_id)));
+                return ProjectEvents::instance()->findAll(array('conditions' => array('`ext_cal_id` = ?', $ext_cal_id)));
         }
         function findById($id) {
-        	return ProjectEvents::findOne(array('conditions' => array('`object_id` = ?', $id)));
+        	return ProjectEvents::instance()->findOne(array('conditions' => array('`object_id` = ?', $id)));
         }
         function findNoSync($contact_id) {
-                return ProjectEvents::findAll(array(
+                return ProjectEvents::instance()->findAll(array(
                     'conditions' => array('special_id = "" AND trashed_by_id = 0 AND trashed_on =\''.EMPTY_DATETIME.'\' AND update_sync  =\''.EMPTY_DATETIME.'\' AND created_by_id = '.$contact_id)));
         }
         function findNoSyncInvitations($contact_id) {
-        	return ProjectEvents::findAll(array(
+        	return ProjectEvents::instance()->findAll(array(
         			'conditions' => array(' trashed_by_id = 0 AND created_by_id <> '.$contact_id.' AND trashed_on =\''.EMPTY_DATETIME.'\' AND synced = 0 AND contact_id = '.$contact_id),
         			 'join' => array(
                             'table' => EventInvitations::instance()->getTableName(),
@@ -164,7 +164,7 @@ class ProjectEvents extends BaseProjectEvents {
 					foreach ($result_events as $k => $event) {
 						$conditions = '`event_id` = ' . $event->getId();
 						if ($user != -1) $conditions .= ' AND `contact_id` = ' . $user;
-						$inv = EventInvitations::findAll(array ('conditions' => $conditions));
+						$inv = EventInvitations::instance()->findAll(array ('conditions' => $conditions));
 						if (!is_array($inv)) {
 							if ($inv == null || (trim($inv_state) != '-1' && !strstr($inv_state, ''.$inv->getInvitationState()) && $inv->getContactId() == logged_user()->getId())) {
 								unset($result_events[$k]);
@@ -211,7 +211,7 @@ class ProjectEvents extends BaseProjectEvents {
 		
 		$user = null;
 		if ($user_filter > 0) {
-			$user = Contacts::findById($user_filter);
+			$user = Contacts::instance()->findById($user_filter);
 		}
 		if ($user_filter != -1 && !$user instanceof Contact) $user = logged_user();
 
@@ -331,7 +331,7 @@ class ProjectEvents extends BaseProjectEvents {
 				$event_ids[] = $event->getId();
 			}
 			
-			$invitations_res = EventInvitations::findAll(array('conditions' => 'contact_id = ' . $user_id));
+			$invitations_res = EventInvitations::instance()->findAll(array('conditions' => 'contact_id = ' . $user_id));
 			$invitations = array();
 			foreach ($invitations_res as $i) {
 				if (!isset($invitations[$i->getEventId()])) $invitations[$i->getEventId()] = array();
@@ -348,11 +348,11 @@ class ProjectEvents extends BaseProjectEvents {
 	}
         
         function import_google_calendar() {
-                $users_cal = ExternalCalendarUsers::findAll(); 
+                $users_cal = ExternalCalendarUsers::instance()->findAll(); 
                 if(count($users_cal) > 0){
                 	$event_controller = new EventController();
                     foreach ($users_cal as $users){
-                        $contact = Contacts::findById($users->getContactId());
+                        $contact = Contacts::instance()->findById($users->getContactId());
                         $calendars = ExternalCalendars::findByExtCalUserId($users->getId());
                         
                         require_once 'Zend/Loader.php';
@@ -423,22 +423,22 @@ class ProjectEvents extends BaseProjectEvents {
                                             if(array_pop(explode( '.', $event->getEventStatus() )) == "canceled"){
                                         	if($new_event){
                                             		$event_controller->delete_event_calendar_extern($new_event);
-                                            		EventInvitations::delete(array("conditions"=>"event_id = ".$new_event->getId()));
+                                            		EventInvitations::instance()->delete(array("conditions"=>"event_id = ".$new_event->getId()));
                                             		$new_event->trash();
                                             		 
                                             		$new_event->setSpecialID("");
                                             		$new_event->setExtCalId(0);
                                             		$new_event->save();
                                             	}elseif ($is_invitation){
-                                            		//$new_event = ProjectEvents::findById($is_invitation->getEventId());
-                                            		EventInvitations::delete(array("conditions"=>"special_id = '".$special_id."'"));
+                                            		//$new_event = ProjectEvents::instance()->findById($is_invitation->getEventId());
+                                            		EventInvitations::instance()->delete(array("conditions"=>"special_id = '".$special_id."'"));
                                             		
                                             	}
                                             }else{
                                             
                                             if($new_event || $is_invitation){
                                             	if($is_invitation){
-                                            		$new_event = ProjectEvents::findById($is_invitation->getEventId());
+                                            		$new_event = ProjectEvents::instance()->findById($is_invitation->getEventId());
                                             		
                                             	}
                                                 if($new_event->getUpdateSync() instanceof DateTimeValue && strtotime(ProjectEvents::date_google_to_sql($event->updated)) > $new_event->getUpdateSync()->getTimestamp()){                                                	
@@ -544,7 +544,7 @@ class ProjectEvents extends BaseProjectEvents {
 
                                                 $conditions = array('event_id' => $new_event->getId(), 'contact_id' => $contact->getId());
                                                 //insert only if not exists 
-                                                if (EventInvitations::findById($conditions) == null) { 
+                                                if (EventInvitations::instance()->findById($conditions) == null) { 
                                                     $invitation = new EventInvitation();
                                                     $invitation->setEventId($new_event->getId());
                                                     $invitation->setContactId($contact->getId());
@@ -579,11 +579,11 @@ class ProjectEvents extends BaseProjectEvents {
                                                         }
                                                     }                                                
                                                     if (count($member_ids) == 0 && $contact instanceof Contact) {
-                                                            $m = Members::findById($contact->getPersonalMemberId());
+                                                            $m = Members::instance()->findById($contact->getPersonalMemberId());
                                                             if (!$m instanceof Member) {
                                                                     $person_dim = Dimensions::findByCode('feng_persons');
                                                                     if ($person_dim instanceof Dimension) {
-                                                                            $member_ids = Members::findAll(array(
+                                                                            $member_ids = Members::instance()->findAll(array(
                                                                                     'id' => true, 
                                                                                     'conditions' => array("object_id = ? AND dimension_id = ?", $contact->getId(), $person_dim->getId())
                                                                             ));
@@ -624,11 +624,11 @@ class ProjectEvents extends BaseProjectEvents {
 	}
         
         function export_google_calendar() {
-                $users_cal = ExternalCalendarUsers::findAll();  
+                $users_cal = ExternalCalendarUsers::instance()->findAll();  
                 if(count($users_cal) > 0){
                     foreach ($users_cal as $users){
                         if($users->getSync() == 1){
-                            $contact = Contacts::findById($users->getContactId());
+                            $contact = Contacts::instance()->findById($users->getContactId());
                             $sql = "SELECT ec.* FROM `".TABLE_PREFIX."external_calendars` ec,`".TABLE_PREFIX."external_calendar_users` ecu 
                                     WHERE ec.ext_cal_user_id = ecu.id AND ec.calendar_feng = 1 AND ecu.contact_id = ".$contact->getId();
                             $calendar_feng = DB::executeOne($sql);
@@ -683,7 +683,7 @@ class ProjectEvents extends BaseProjectEvents {
                                             $event->setUpdateSync(ProjectEvents::date_google_to_sql($createdEvent->updated));
                                             $event->setExtCalId($calendar_feng['id']);
                                             $event->save();
-                                       		$invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
+                                       		$invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
                                         	if($invitation){
                                         		$invitation->setUpdateSync();
                                         		$invitation->setSpecialId($special_id);
@@ -718,7 +718,7 @@ class ProjectEvents extends BaseProjectEvents {
                                         	$event_id = explode("/",$createdEvent->id->text);
                                         	$special_id = end($event_id);
                                         	 
-                                        	$invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
+                                        	$invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
                                         	if($invitation){
                                         		$invitation->setUpdateSync();
                                         		$invitation->setSpecialId($special_id);
@@ -799,7 +799,7 @@ class ProjectEvents extends BaseProjectEvents {
                                             $event->setUpdateSync(ProjectEvents::date_google_to_sql($createdEvent->updated));
                                             $event->setExtCalId($calendar->getId());
                                             $event->save();
-                                            $invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
+                                            $invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
                                             if($invitation){
                                         		$invitation->setUpdateSync();
                                         		$invitation->setSpecialId($special_id);
@@ -833,7 +833,7 @@ class ProjectEvents extends BaseProjectEvents {
                                         
                                         	$event_id = explode("/",$createdEvent->id->text);
                                         	$special_id = end($event_id);
-                                        	$invitation = EventInvitations::findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
+                                        	$invitation = EventInvitations::instance()->findOne(array('conditions' => array('contact_id = '.$users->getContactId().' AND event_id ='.$event->getId())));
                                         	if($invitation){
                                         		$invitation->setUpdateSync();
                                         		$invitation->setSpecialId($special_id);
@@ -878,11 +878,11 @@ class ProjectEvents extends BaseProjectEvents {
         }
         
         function findByRelated($event_id) {
-                return ProjectEvents::findAll(array('conditions' => array('`original_event_id` = ?', $event_id)));
+                return ProjectEvents::instance()->findAll(array('conditions' => array('`original_event_id` = ?', $event_id)));
         }
         
         function findByEventAndRelated($event_id,$original_event_id) {
-                return ProjectEvents::findAll(array('conditions' => array('(`original_event_id` = ? OR `object_id` = ?) AND `object_id` <> ?', $original_event_id,$original_event_id,$event_id)));
+                return ProjectEvents::instance()->findAll(array('conditions' => array('(`original_event_id` = ? OR `object_id` = ?) AND `object_id` <> ?', $original_event_id,$original_event_id,$event_id)));
         }
         
         

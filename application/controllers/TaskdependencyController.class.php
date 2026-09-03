@@ -9,7 +9,7 @@ class TaskdependencyController extends ApplicationController {
 	function remove() {
 		$pt = DB::escape(array_var($_GET, 'pt'));
 		$t = DB::escape(array_var($_GET, 't'));
-		$dep = ProjectTaskDependencies::findOne(array('conditions' => "`previous_task_id` = $pt AND `task_id` = $t"));
+		$dep = ProjectTaskDependencies::instance()->findOne(array('conditions' => "`previous_task_id` = $pt AND `task_id` = $t"));
 		if ($dep instanceof ProjectTaskDependency) {
 			$dep->delete();
 			flash_success(lang('success remove task dependency'));
@@ -28,7 +28,7 @@ class TaskdependencyController extends ApplicationController {
 	function add() {
 		$pt = DB::escape(array_var($_GET, 'pt'));
 		$t = DB::escape(array_var($_GET, 't'));
-		$dep = ProjectTaskDependencies::findOne(array('conditions' => "`previous_task_id` = $pt AND `task_id` = $t"));
+		$dep = ProjectTaskDependencies::instance()->findOne(array('conditions' => "`previous_task_id` = $pt AND `task_id` = $t"));
 		if (!$dep instanceof ProjectTaskDependency) {
 			try {
 				DB::beginWork();

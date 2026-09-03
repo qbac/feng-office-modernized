@@ -67,7 +67,7 @@
     * @param void
     * @return array
     */
-    abstract function getColumns();
+    abstract static function getColumns();
     
     /**
     * Return column type

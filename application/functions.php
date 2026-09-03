@@ -468,7 +468,7 @@ function active_context_members($full = true ) {
 function get_context_from_array($ids){
 	$context = array();
 	foreach ($ids as $id) {
-		$member = Members::findById($id) ;
+		$member = Members::instance()->findById($id) ;
 		$context[] = $member;
 	}
 	return $context ;
@@ -911,10 +911,10 @@ function create_user($user_data, $permissionsString) {
 			$permissions = array();
 			$default_permissions = RoleObjectTypePermissions::instance()->findAll(array('conditions' => 'role_id = '.$contact->getUserType()));
 			
-			$dimensions = Dimensions::findAll();
+			$dimensions = Dimensions::instance()->findAll();
 			foreach ($dimensions as $dimension) {
 				if ($dimension->getDefinesPermissions()) {
-					$cdp = ContactDimensionPermissions::findOne(array("conditions" => "`permission_group_id` = ".$contact->getPermissionGroupId()." AND `dimension_id` = ".$dimension->getId()));
+					$cdp = ContactDimensionPermissions::instance()->findOne(array("conditions" => "`permission_group_id` = ".$contact->getPermissionGroupId()." AND `dimension_id` = ".$dimension->getId()));
 					if (!$cdp instanceof ContactDimensionPermission) {
 						$cdp = new ContactDimensionPermission();
 						$cdp->setPermissionGroupId($contact->getPermissionGroupId());
@@ -1038,7 +1038,7 @@ function create_user($user_data, $permissionsString) {
 
 // Warning don't use this function inside a mysql transaction, use it after comit.
 function send_notification($user_data, $contact_id){
-	$contact = Contacts::findById($contact_id);//$contact->getId()
+	$contact = Contacts::instance()->findById($contact_id);//$contact->getId()
 	$password = '';
 	// Send notification
 	try {
@@ -1130,7 +1130,7 @@ function get_enum_values($table, $column) {
 function get_user_dimensions_ids(){
 		
 	//All dimensions
-		$all_dimensions = Dimensions::findAll();
+		$all_dimensions = Dimensions::instance()->findAll();
 		$dimensions_to_show = array();
 		
 		foreach ($all_dimensions as $dim){
@@ -1160,7 +1160,7 @@ function build_context_array($context_plain) {
 					//cambiar
 					foreach ($members as $member) {
 						if ($member && is_numeric($member)) { 
-							$member = Members::findById($member) ;													
+							$member = Members::instance()->findById($member) ;													
 							if ($member instanceof Member ){
 								$context[] = $member ;
 							}

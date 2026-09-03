@@ -56,7 +56,7 @@ require_javascript('og/modules/addMessageForm.js');
 
 	<?php if(is_array($users) && count($users)) { ?>
 		<div onclick="og.subscribeCompany(this)" class="container-div company-name<?php echo $allChecked ? ' checked' : '' ?>" onmouseout="og.rollOut(this,true)" onmouseover="og.rollOver(this)">
-		<?php $theCompany = Contacts::findById($companyId) ?>
+		<?php $theCompany = Contacts::instance()->findById($companyId) ?>
 			<label for="<?php echo $genid ?>notifyCompany<?php echo ($theCompany instanceof Contact ? $theCompany->getId() : "0") ?>" style="background: url('<?php echo ($theCompany instanceof Contact ? $theCompany->getPictureUrl() : "#") ?>') no-repeat;"><?php echo ($theCompany instanceof Contact ? clean($theCompany->getFirstName()) : lang('without company')) ?></label><br/>
 		</div>
 		<div style="padding-left:10px;">

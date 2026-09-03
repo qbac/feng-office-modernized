@@ -50,8 +50,8 @@ class TimeController extends ApplicationController {
 		$start = array_var($_GET, 'start', 0);
 		$limit = 20;
 		
-		$tasksUser = Contacts::findById($tasksUserId);
-		$timeslotsUser = Contacts::findById($timeslotsUserId);	
+		$tasksUser = Contacts::instance()->findById($tasksUserId);
+		$timeslotsUser = Contacts::instance()->findById($timeslotsUserId);	
 		
 		//Active tasks view
 		$open_timeslots = Timeslots::instance()->listing(array(
@@ -59,7 +59,7 @@ class TimeController extends ApplicationController {
 		))->objects;
 		$tasks = array();
 		foreach($open_timeslots as $open_timeslot) {
-			$task = ProjectTasks::findById($open_timeslot->getRelObjectId());
+			$task = ProjectTasks::instance()->findById($open_timeslot->getRelObjectId());
 			if ($task instanceof ProjectTask && !$task->isCompleted() && !$task->isTrashed() && !$task->isArchived()) $tasks[] = $task;
 		}
 		ProjectTasks::populateTimeslots($tasks);
@@ -189,9 +189,9 @@ class TimeController extends ApplicationController {
 			}
 			$timeslot->setFromAttributes($timeslot_data);
 			
-			$user = Contacts::findById($timeslot_data['contact_id']);
+			$user = Contacts::instance()->findById($timeslot_data['contact_id']);
 			$billing_category_id = $user->getDefaultBillingId();
-			$bc = BillingCategories::findById($billing_category_id);
+			$bc = BillingCategories::instance()->findById($billing_category_id);
 			if ($bc instanceof BillingCategory) {
 				$timeslot->setBillingId($billing_category_id);
 				$hourly_billing = $bc->getDefaultValue();
@@ -221,7 +221,7 @@ class TimeController extends ApplicationController {
 		
 		ajx_current("empty");
 		$timeslot_data = array_var($_POST, 'timeslot');
-		$timeslot = Timeslots::findById(array_var($timeslot_data,'id',0));
+		$timeslot = Timeslots::instance()->findById(array_var($timeslot_data,'id',0));
 	
 		if (!$timeslot instanceof Timeslot){
 			flash_error(lang('timeslot dnx'));
@@ -276,9 +276,9 @@ class TimeController extends ApplicationController {
 				
 			$timeslot->setFromAttributes($timeslot_data);
 			
-			$user = Contacts::findById($timeslot_data['contact_id']);
+			$user = Contacts::instance()->findById($timeslot_data['contact_id']);
 			$billing_category_id = $user->getDefaultBillingId();
-			$bc = BillingCategories::findById($billing_category_id);
+			$bc = BillingCategories::instance()->findById($billing_category_id);
 			if ($bc instanceof BillingCategory) {
 				$timeslot->setBillingId($billing_category_id);
 				$hourly_billing = $bc->getDefaultValue();
@@ -305,7 +305,7 @@ class TimeController extends ApplicationController {
 	
 	function delete_timeslot(){
 		ajx_current("empty");
-		$timeslot = Timeslots::findById(get_id());
+		$timeslot = Timeslots::instance()->findById(get_id());
 		
 		if (!$timeslot instanceof Timeslot){
 			flash_error(lang('timeslot dnx'));

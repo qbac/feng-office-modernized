@@ -57,7 +57,7 @@ class MemberCustomPropertyValue extends BaseMemberCustomPropertyValue {
 					$formatted = $this->getValue();
 					break;
 				case 'contact':
-					$c = Contacts::findById($this->getValue());
+					$c = Contacts::instance()->findById($this->getValue());
 					$formatted = $c instanceof Contact ? clean($c->getObjectName()) : '';
 					break;
 				case 'boolean':

@@ -48,7 +48,7 @@
     * @param void
     * @return array
     */
-    function getColumns($only_names = true) {
+    static function getColumns($only_names = true) {
     	if ($only_names) {
       		return array_keys(self::$columns);
     	} else {
@@ -210,11 +210,11 @@
     * @param integer $current_page Current page number
     * @return array
     */
-    function paginate($arguments = null, $items_per_page = 10, $current_page = 1) {
+    function paginate($arguments = null, $items_per_page = 10, $current_page = 1, $count = null) {
       if(isset($this) && instance_of($this, 'Objects')) {
-        return parent::paginate($arguments, $items_per_page, $current_page);
+        return parent::paginate($arguments, $items_per_page, $current_page, $count);
       } else {
-        return Objects::instance()->paginate($arguments, $items_per_page, $current_page);
+        return Objects::instance()->paginate($arguments, $items_per_page, $current_page, $count);
       } // if
     } // paginate
     
@@ -223,7 +223,7 @@
     *
     * @return Objects 
     */
-    function instance() {
+    static function instance() {
       static $instance;
       if(!instance_of($instance, 'Objects')) {
         $instance = new Objects();

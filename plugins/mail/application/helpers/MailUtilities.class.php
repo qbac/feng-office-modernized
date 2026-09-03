@@ -16,7 +16,7 @@ class MailUtilities {
 		Env::useHelper('permissions');
 		Env::useHelper('format');
 		if (is_null($accounts)) {
-			$accounts = MailAccounts::findAll();
+			$accounts = MailAccounts::instance()->findAll();
 		}
 		if (config_option('user_email_fetch_count') && $maxPerAccount == 0) {
 			$maxPerAccount = config_option('user_email_fetch_count');
@@ -232,7 +232,7 @@ class MailUtilities {
 						$id_condition .= " AND `sent_date`='".$sent_date_str."'";
 					}
 				}
-				$same = MailContents::findOne(array('conditions' => "`account_id`=".$account->getId() . $id_condition, 'include_trashed' => true));
+				$same = MailContents::instance()->findOne(array('conditions' => "`account_id`=".$account->getId() . $id_condition, 'include_trashed' => true));
 				if ($same instanceof MailContent) return;
 			}
 			
@@ -434,13 +434,13 @@ class MailUtilities {
 						
 			//check if exists a conversation for this mail
 			if ($in_reply_to_id != "" && $message_id != "") {
-				$conv_mail = MailContents::findOne(array("conditions" => "`account_id`=".$account->getId()." AND (`message_id` = '$in_reply_to_id' OR `in_reply_to_id` = '$message_id')"));
+				$conv_mail = MailContents::instance()->findOne(array("conditions" => "`account_id`=".$account->getId()." AND (`message_id` = '$in_reply_to_id' OR `in_reply_to_id` = '$message_id')"));
 				
 				//check if this mail is in two diferent conversations and fixit
 				if($conv_mail){
-					$other_conv_mail = MailContents::findOne(array("conditions" => "`account_id`=".$account->getId()." AND `conversation_id` != ".$conv_mail->getConversationId()." AND (`message_id` = '$in_reply_to_id' OR `in_reply_to_id` = '$message_id')"));
+					$other_conv_mail = MailContents::instance()->findOne(array("conditions" => "`account_id`=".$account->getId()." AND `conversation_id` != ".$conv_mail->getConversationId()." AND (`message_id` = '$in_reply_to_id' OR `in_reply_to_id` = '$message_id')"));
 					if($other_conv_mail){
-						$other_conv = MailContents::findAll(array("conditions" => "`account_id`=".$account->getId()." AND `conversation_id` = ".$other_conv_mail->getConversationId()));
+						$other_conv = MailContents::instance()->findAll(array("conditions" => "`account_id`=".$account->getId()." AND `conversation_id` = ".$other_conv_mail->getConversationId()));
 						if($other_conv){
 							foreach ($other_conv as $mail_con) {
 								$mail_con->setConversationId($conv_mail->getConversationId());
@@ -451,9 +451,9 @@ class MailUtilities {
 				}
 				
 			} elseif ($in_reply_to_id != ""){
-				$conv_mail = MailContents::findOne(array("conditions" => "`account_id`=".$account->getId()." AND `message_id` = '$in_reply_to_id'"));
+				$conv_mail = MailContents::instance()->findOne(array("conditions" => "`account_id`=".$account->getId()." AND `message_id` = '$in_reply_to_id'"));
 			} elseif ($message_id != ""){
-				$conv_mail = MailContents::findOne(array("conditions" => "`account_id`=".$account->getId()." AND `in_reply_to_id` = '$message_id'"));
+				$conv_mail = MailContents::instance()->findOne(array("conditions" => "`account_id`=".$account->getId()." AND `in_reply_to_id` = '$message_id'"));
 			} 
 			
 			if ($conv_mail instanceof MailContent) {
@@ -476,7 +476,7 @@ class MailUtilities {
 			}
 			
 			// CLASSIFY MAILS IF THE ACCOUNT HAS A DIMENSION MEMBER AND NOT CLASSIFIED WITH CONVERSATION
-			$account_owner = Contacts::findById($account->getContactId());
+			$account_owner = Contacts::instance()->findById($account->getContactId());
 			if ($account->getMemberId() != 0 && !$classified_with_conversation) {
 				$member = $account->getMember() ;
 				if ($member && $member instanceof Member ) {
@@ -493,7 +493,7 @@ class MailUtilities {
 				$mail_controller->do_classify_mail($mail, $member_ids, null, false, true);
 			}
 		
-			$user = Contacts::findById($account->getContactId());
+			$user = Contacts::instance()->findById($account->getContactId());
 			if ($user instanceof Contact) {
 				$mail->subscribeUser($user);
 			}
@@ -1055,7 +1055,7 @@ class MailUtilities {
 	}
 
 	function deleteMailsFromServerAllAccounts() {
-		$accounts = MailAccounts::findAll();
+		$accounts = MailAccounts::instance()->findAll();
 		$count = 0;
 		foreach ($accounts as $account) {
 			try {

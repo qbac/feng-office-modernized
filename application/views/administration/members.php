@@ -8,7 +8,7 @@
 
 <div class="adminUsersList" style="height:100%;background-color:white">
   <div class="adminHeader">
-  	<div class="adminTitle"><?php echo lang('users') . (config_option('max_users')?(' (' . Contacts::count() .' / ' .  config_option('max_users') . ')'):'') ?></div>
+  	<div class="adminTitle"><?php echo lang('users') . (config_option('max_users')?(' (' . Contacts::instance()->count() .' / ' .  config_option('max_users') . ')'):'') ?></div>
   </div>
   <div class="adminSeparator"></div>
   <div class="adminMainBlock">

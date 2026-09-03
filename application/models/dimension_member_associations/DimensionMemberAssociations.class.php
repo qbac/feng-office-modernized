@@ -62,17 +62,17 @@
   	
     function getAllAssociations($dimension_id, $associated_dimension_id) {
 
-  		$associations =  self::findAll(array('conditions' => '`dimension_id` = ' . 
+  		$associations =  self::instance()->findAll(array('conditions' => '`dimension_id` = ' . 
 								$dimension_id.' AND `associated_dimension_id` = ' . $associated_dimension_id));
 		return $associations;
   	}
   	
   	static function getAssociatations($dimension_id, $object_type_id) {
-  		return self::findAll(array("conditions" => array("`dimension_id` = ? AND `object_type_id` = ?", $dimension_id, $object_type_id)));
+  		return self::instance()->findAll(array("conditions" => array("`dimension_id` = ? AND `object_type_id` = ?", $dimension_id, $object_type_id)));
   	}
   	
 	static function getRequiredAssociatations($dimension_id, $object_type_id, $only_ids = false) {
-  		return self::findAll(array(
+  		return self::instance()->findAll(array(
   			"conditions" => array("`dimension_id` = ? AND `object_type_id` = ? AND is_required = 1", $dimension_id, $object_type_id),
   			"id" => $only_ids,
   		));
@@ -80,7 +80,7 @@
   
   	
     function existsAssociationBetweenDimensions($dimension_id, $associated_dimension_id){
-  		$associations =  self::findOne(array('conditions' => '`dimension_id` = ' . 
+  		$associations =  self::instance()->findOne(array('conditions' => '`dimension_id` = ' . 
 								$dimension_id.' AND `associated_dimension_id` = ' . $associated_dimension_id));
 			
 		if (is_null($associations)) return false;

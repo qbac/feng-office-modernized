@@ -81,7 +81,7 @@
 	// add assigned users to users array
 	foreach ($assigned_users as $auser) {
 		if (!in_array($auser, $user_ids)) {
-			$user = Contacts::findById($auser);
+			$user = Contacts::instance()->findById($auser);
 			if ($user instanceof Contact) $users_array[] = $user->getArrayInfo();
 		}
 	}

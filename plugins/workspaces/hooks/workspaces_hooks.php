@@ -55,7 +55,7 @@ function workspaces_include_tasks_template($ignored, &$more_content_templates) {
 
 function workspaces_quickadd_extra_fields($parameters) {
 	if (array_var($parameters, 'dimension_id') == Dimensions::findByCode("workspaces")->getId()) {
-		$parent_member = Members::findById(array_var($parameters, 'parent_id'));
+		$parent_member = Members::instance()->findById(array_var($parameters, 'parent_id'));
 		if ($parent_member instanceof Member && $parent_member->getObjectId() > 0) {
 			$dimension_object = Objects::findObject($parent_member->getObjectId());
 			

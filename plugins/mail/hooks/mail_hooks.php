@@ -28,11 +28,11 @@ function mail_on_page_load(){
 	//check if have outbox mails
 	$usu = logged_user();
 	$conditions = array("conditions" => array("`state` >= 200 AND (`state`%2 = 0) AND `archived_on`=0 AND `trashed_on`=0 AND `created_by_id` =".$usu->getId()));
-	$outbox_mails = MailContents::findAll($conditions);
+	$outbox_mails = MailContents::instance()->findAll($conditions);
 	if ($outbox_mails!= null){
 		if (count($outbox_mails)>=1){
 			$arguments = array("conditions" => array("`context` LIKE 'mails_in_outbox%' AND `contact_id` = ".$usu->getId().";"));
-			$exist_reminder = ObjectReminders::find($arguments);
+			$exist_reminder = ObjectReminders::instance()->find($arguments);
 			if (!(count($exist_reminder)>0)){
 				$reminder = new ObjectReminder();
 			

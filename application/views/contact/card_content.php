@@ -7,10 +7,10 @@
 	$main_email = $contact->getEmailAddress('personal');
 	$personal_emails = $contact->getContactEmails('personal');
 	
-	$all_phones = ContactTelephones::findAll(array('conditions' => 'contact_id = '.$contact->getId()));
-	$all_addresses = ContactAddresses::findAll(array('conditions' => 'contact_id = '.$contact->getId()));
-	$all_webpages = ContactWebpages::findAll(array('conditions' => 'contact_id = '.$contact->getId()));
-	$all_other_emails = ContactEmails::findAll(array('conditions' => 'is_main=0 AND contact_id = '.$contact->getId()));
+	$all_phones = ContactTelephones::instance()->findAll(array('conditions' => 'contact_id = '.$contact->getId()));
+	$all_addresses = ContactAddresses::instance()->findAll(array('conditions' => 'contact_id = '.$contact->getId()));
+	$all_webpages = ContactWebpages::instance()->findAll(array('conditions' => 'contact_id = '.$contact->getId()));
+	$all_other_emails = ContactEmails::instance()->findAll(array('conditions' => 'is_main=0 AND contact_id = '.$contact->getId()));
 
 	$all_telephone_types = TelephoneTypes::getAllTelephoneTypesInfo();
 	$all_address_types = AddressTypes::getAllAddressTypesInfo();
