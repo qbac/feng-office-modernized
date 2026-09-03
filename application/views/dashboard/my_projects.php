@@ -1,7 +1,7 @@
 <?php 
   set_page_title(lang('my projects'));
   
-  if(Project::canAdd(logged_user())) {
+  if((new Project())->canAdd(logged_user())) {
     add_page_action(lang('add project'), get_url('project', 'add'), 'ico-add');
   } // if
 

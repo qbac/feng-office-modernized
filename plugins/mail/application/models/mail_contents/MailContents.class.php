@@ -173,7 +173,7 @@ class MailContents extends BaseMailContents {
 		));
 	} // getProjectMails
 
-	function delete($condition) {
+	function delete($condition = null) {
 		if(isset($this) && instance_of($this, 'MailContents')) {
 			// Delete contents from filesystem
 			$sql = "SELECT `content_file_id` FROM ".self::instance()->getTableName(true)." WHERE $condition";
@@ -208,7 +208,7 @@ class MailContents extends BaseMailContents {
 	 * @param Project $project
 	 * @return array
 	 */
-	function getEmails($account_id = null, $state = null, $read_filter = "", $classif_filter = "", $context = null, $start = null, $limit = null, $order_by = 'received_date', $dir = 'ASC', $join_params = null, $archived = false, $conversation_list = null, $only_count_result = false) {
+	static function getEmails($account_id = null, $state = null, $read_filter = "", $classif_filter = "", $context = null, $start = null, $limit = null, $order_by = 'received_date', $dir = 'ASC', $join_params = null, $archived = false, $conversation_list = null, $only_count_result = false) {
 		$mailTablePrefix = "e";
 		if (!$limit) $limit = user_config_option('mails_per_page') ? user_config_option('mails_per_page') : config_option('files_per_page');
 		$accountConditions = "";
@@ -295,11 +295,11 @@ class MailContents extends BaseMailContents {
 		
 	}
 	
-	function getByMessageId($message_id) {
+	static function getByMessageId($message_id) {
 		return self::instance()->findOne(array('conditions' => array('`message_id` = ?', $message_id)));
 	}
 	
-	function countUserInboxUnreadEmails() {
+	static function countUserInboxUnreadEmails() {
 		$tp = TABLE_PREFIX;
 		$uid = logged_user()->getId();
 		$sql = "SELECT count(*) `c` FROM `{$tp}mail_contents` `a`, `{$tp}read_objects` `b` WHERE `b`.`rel_object_manager` = 'MailContents' AND `b`.`rel_object_id` = `a`.`id` AND `b`.`user_id` = '$uid' AND `b`.`is_read` = '1' AND `a`.`trashed_on` = '0000-00-00 00:00:00' AND `a`.`is_deleted` = 0 AND `a`.`archived_by_id` = 0 AND (`a`.`state` = '0' OR `a`.`state` = '5') AND " . permissions_sql_for_listings(MailContents::instance(), ACCESS_LEVEL_READ, logged_user(), null, '`a`');
@@ -388,7 +388,7 @@ class MailContents extends BaseMailContents {
          * @param string $condition
          * @return object 
          */
-        function getConditionsRules($condition){
+        static function getConditionsRules($condition){
 		return MailContents::instance()->findAll(array(
 			'conditions' => $condition,
 			'join' => array(

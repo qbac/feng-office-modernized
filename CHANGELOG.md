@@ -7,6 +7,135 @@ Najnowsze zmiany na górze.
 
 ## [Nieopublikowane]
 
+## 2026-09-03 (część 2): pełny dashboard z realnymi danymi po zalogowaniu
+
+Kontynuacja tej samej sesji — po naprawieniu "pustego body" (patrz część 1 niżej) okazało się,
+że po zalogowaniu główny dashboard nadal pokazywał komunikat "system Feng Office nie jest
+obecnie w stanie wykonać Twojego żądania". Przyczyna identyczna jak w części 1 — kolejna
+kaskada tego samego typu błędów (`Non-static method X cannot be called statically`, niezgodne
+sygnatury nadpisanych metod), tym razem w kodzie renderującym layout aplikacji (`website.php`)
+i panele dashboardu, docierająca aż do konkretnej wtyczki `workspaces` (stąd zgłoszony przez
+użytkownika objaw: "obszary robocze są cały czas problemem że się nie pokazują").
+
+Zweryfikowane wizualnie w przeglądarce (Chrome, sesja zalogowana): dashboard renderuje
+kalendarz, listę zaległych/nadchodzących zadań, listę osób, nieprzeczytane wiadomości; drzewo
+"Obszary robocze" pokazuje realne workspace'y produkcyjne (kilku rzeczywistych obszarów roboczych klienta -
+nazwy pominięte); zakładka "Przegląd" listuje 69888 obiektów; zakładka "E-mail"
+pokazuje realne wiadomości; zakładka "Kontakty" działa (pusta lista to poprawne zachowanie dla
+bieżącego kontekstu). Konsola przeglądarki: 0 błędów aplikacji (tylko szum od rozszerzenia
+Chrome, niezwiązany z Feng Office).
+
+### Naprawione — kolejne przypadki "non-static method called statically"
+
+- `application/layouts/website.php` (linia z `Hook::fire('on_page_load', 'mail', ...)`) →
+  `plugins/mail/hooks/mail_hooks.php` (`mail_on_page_load`) wołał `MailContents::instance()->
+  findAll()` — samo `findAll` OK, ale konstrukcja klasy `MailContent` (patrz niżej) crashowała
+  wcześniej niezależnie.
+- `environment/classes/localization/Localization.class.php` — `dateByLocalization()` (jedyna
+  metoda w tej klasie faktycznie wołana statycznie z zewnątrz, `application/helpers/format.php`)
+  → dodano `static`.
+- `application/models/tab_panel_permissions/TabPanelPermissions.class.php` — 4 metody
+  (`clearByPermissionGroup`, `isModuleEnabled`, `getRoleModules`, `getAllRolesModules`) → `static`.
+- `application/models/permission_groups/PermissionGroups.class.php` — 4 metody
+  (`getNonPersonalPermissionGroups`, `getNonPersonalSameLevelPermissionsGroups`, `getParentId`,
+  `getGuestPermissionGroups`) → `static`.
+- `application/models/project_milestones/ProjectMilestones.class.php` — 3 metody
+  (`createMilestoneCopy`, `copyTasks`, `getRangeMilestones`) → `static`.
+- `application/models/notifier/Notifier.class.php` — 5 metod (`notifyAction`,
+  `milestoneAssigned`, `taskAssigned`, `workEstimate`, `sendReminders`) → `static`.
+- `plugins/mail/application/models/mail_accounts/MailAccounts.class.php` — 2 metody
+  (`getMailAccountsByUser`, `getMailAccountsEditByUser`) → `static` (`getAccountById` zostawione
+  bez zmian - używa `$this`).
+- `plugins/mail/application/models/mail_account_contacts/MailAccountContacts.class.php` — 6
+  metod (`getByAccount`, `getByContact`, `getByAccountAndContact`, `deleteByAccount`,
+  `deleteByContact`, `countByAccount`) → `static`.
+- `plugins/mail/application/models/mail_contents/MailContents.class.php` — 4 metody
+  (`getEmails`, `getByMessageId`, `countUserInboxUnreadEmails`, `getConditionsRules`) → `static`.
+- **`(new ClassName())->canAdd(...)` zamiast `ClassName::canAdd(...)`** — zweryfikowane empirycznie
+  (patrz "Ważna korekta wiedzy" niżej), że PHP 8.4 rzuca fatal error NIEZALEŻNIE od tego, czy
+  `$this` istnieje w wywołującym kontekście (np. wewnątrz metody kontrolera) - liczy się tylko,
+  czy jest zgodny typem. ~30 wywołań statycznych `canAdd()` (na `ProjectEvent`, `ProjectFile`,
+  `ProjectForm`, `ProjectMessage`, `ProjectMilestone`, `ProjectTask`, `ProjectWebpage`, `Contact`,
+  `MailAccount`) w kontrolerach i widokach zamienione skryptowo na `(new ClassName())->canAdd(...)`
+  (metoda sama w sobie nie używa stanu instancji - to bezpieczna, semantycznie poprawna zamiana,
+  bo `canAdd` sprawdza uprawnienie do dodania NOWEGO obiektu). Pominięto jedno martwe wystąpienie
+  (`Project::canAdd()` w `application/views/dashboard/my_projects.php` - klasa `Project` w ogóle
+  nie istnieje w tej wersji, kod już wcześniej niedziałający, poza zakresem tej migracji).
+- `application/widgets/calendar/index.php` — `ProjectEvent::canAdd()` (ten sam przypadek,
+  znaleziony osobno przed mass-fixem).
+
+### Naprawione — `eval()` z dynamiczną klasą wołającą niestatyczną metodę statycznie
+
+- `application/models/objects/Objects.class.php` (`findObject()`) — `eval('... '.$handler_class.
+  '::findById(...)')` zamienione na `$handler_class::instance()->findById($object_id)` (usunięto
+  `eval()` całkowicie - PHP wspiera wywołania statyczne przez zmienną klasy natywnie).
+- `application/controllers/MemberController.class.php` (2 miejsca) — `eval('...'.$handler_class.
+  '::getPublicColumns()')` → `$handler_class::instance()->getPublicColumns()`.
+- `application/controllers/TemplateController.class.php` — analogicznie dla
+  `getTemplateObjectProperties()`.
+
+### Naprawione — kolejne niezgodne sygnatury metod (fatalne błędy kompilacji)
+
+- `application/models/object_types/ObjectType.class.php` (`getIsLinkableObjectType()`) —
+  `catch(Exception $e)` → `catch(Throwable $e)` (błąd fatalny wewnątrz `eval()` przy
+  konstruowaniu obiektu nie był łapany), plus `Logger::log()` błędu zamiast cichego przełknięcia.
+- `application/models/comments/Comment.class.php` — `getCommentNum()` koliduje nazwą z
+  `ContentDataObject::getCommentNum(Comment $comment)` (inna funkcja, przypadkowa kolizja nazw,
+  jak wcześniej `getTableName()`) → dodano zgodny (nullable) parametr, metoda nieużywana z
+  zewnątrz więc zero ryzyka zmiany zachowania.
+- `plugins/mail/application/models/mail_contents/MailContent.class.php` — `getComments()` →
+  dodano brakujący parametr `$include_trashed = false` zgodny z `ContentDataObject`.
+- `application/models/DimensionObject.class.php` i `plugins/workspaces/application/models/
+  Workspace.class.php` — `getIconClass()` → dodano brakujący parametr `$large = false` zgodny z
+  `ContentDataObject::getIconClass($large = false)` (to dokładnie ten błąd blokował wyświetlanie
+  drzewa "Obszary robocze" — konstrukcja klasy `Workspace` failowała przy autoloadzie).
+
+### Naprawione — `ContentDataObjects::listing()` wołane na klasie abstrakcyjnej
+
+Cztery miejsca (`DashboardController.class.php`, 3x `ObjectController.class.php`) wołały
+`ContentDataObjects::listing(...)` bezpośrednio na klasie abstrakcyjnej — zamierzony,
+udokumentowany w kodzie wzorzec "generycznego listowania obiektów wszystkich typów", polegający
+w PHP 5 na tym, że `$this` wewnątrz metody było cicho `null`, a metoda (`listing()` i pomocnicza
+`getObjectTypeId()`) sprawdzała `$this instanceof ContentDataObjects` żeby wykryć ten przypadek.
+**W PHP 8 samo odwołanie się do `$this` poza kontekstem obiektu jest fatalnym błędem** - a
+wywołanie niestatycznej metody statycznie fatalnie kończy się jeszcze wcześniej, zanim ciało
+metody w ogóle zacznie się wykonywać (zweryfikowane empirycznie - `isset($this)` nie pomaga,
+bo call site fatalnieje first). Nie da się tego naprawić samym dodaniem `static`, bo metoda
+faktycznie różni się zachowaniem zależnie od tego, czy jest wywołana na konkretnym obiekcie.
+
+Rozwiązanie: nowa klasa `application/models/GenericContentDataObjects.class.php` — konkretna,
+"bezosobowa" podklasa `ContentDataObjects` (konstruktor jak `BaseObjects`, `object_type_name`
+pozostaje `null`, dokładnie odtwarzając stare zachowanie "brak `$this`"). 4 wywołania zamienione
+na `(new GenericContentDataObjects())->listing(...)`.
+
+### Naprawione — pozostałości `ext/mysql` (usuniętego w PHP 7)
+
+Zamiast punktowo poprawiać kilkanaście wywołań `mysql_real_escape_string()`/`mysql_query()`/
+`mysql_fetch_array()`/`mysql_error()` w różnych kontrolerach (ryzyko literówek przy ręcznym
+przepisywaniu zapytań SQL budowanych przez konkatenację), dodano w
+`environment/functions/general.php` kompatybilne polyfille tych 4 funkcji oparte o aktywne
+połączenie PDO (`DB::connection()->getLink()`) — zachowują identyczny kontrakt (m.in.
+`mysql_real_escape_string` NIE dodaje cudzysłowów wokół wyniku, tak jak oryginał, żeby nie
+złamać istniejących zapytań budowanych jako `"... = '".mysql_real_escape_string($x)."'"`).
+
+### Naprawione — `count(): Argument #1 must be of type Countable|array, null given`
+
+Kolejna kategoria fatalnych `TypeError` w PHP 8 (w PHP 7 `count(null)` tylko ostrzegał i zwracał
+0) - dodano `is_array()`/domyślną wartość przed `count()` w:
+`application/controllers/DimensionController.class.php`,
+`application/models/ContentDataObjects.class.php`,
+`application/models/object_members/ObjectMembers.class.php` (2 miejsca).
+
+### Ważna korekta wiedzy (dla przyszłych sesji)
+
+Wcześniejsze założenie "wywołanie niestatycznej metody statycznie jest bezpieczne, jeśli
+wywołujący kontekst ma jakiekolwiek `$this`" jest **błędne**. Zweryfikowane empirycznie: PHP 8.4
+fatalnie kończy wywołanie `B::niestatyczna()` z wnętrza metody instancji klasy `A` (niezwiązanej
+z `B`) dokładnie tak samo, jak z kontekstu w pełni statycznego - liczy się WYŁĄCZNIE zgodność
+typu `$this` z klasą deklarującą metodę (albo jej przodkiem/potomkiem). To oznacza, że każde
+wywołanie `ClassName::metoda()` (bez `self::`/`parent::` z rzeczywiście zgodnej hierarchii) do
+metody NIE oznaczonej `static` jest fatalne w PHP 8+, niezależnie od tego, skąd jest wołane.
+
 ## 2026-09-03
 
 ### PHP 8.4: naprawiony "puste body" — działa end-to-end

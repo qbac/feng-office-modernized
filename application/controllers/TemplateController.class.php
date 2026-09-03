@@ -799,7 +799,7 @@ class TemplateController extends ApplicationController {
 	function get_object_properties(){
 		$props = array();
 		$type = "ProjectTasks";
-		eval('$objectProperties = '.$type.'::getTemplateObjectProperties();');
+		$objectProperties = $type::instance()->getTemplateObjectProperties();
 		/**
 		 * Allow to add/edit/delete template object properties
 		 */

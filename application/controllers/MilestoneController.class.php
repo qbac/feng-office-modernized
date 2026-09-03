@@ -82,7 +82,7 @@ class MilestoneController extends ApplicationController {
 		$this->setTemplate('add_milestone');
 		
 		$notAllowedMember = '' ;
-		if(!ProjectMilestone::canAdd(logged_user(), active_context(), $notAllowedMember)) {
+		if(!(new ProjectMilestone())->canAdd(logged_user(), active_context(), $notAllowedMember)) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the milestone'))) : flash_error(lang('no context permissions to add',lang("milestones"),$notAllowedMember));
 			ajx_current("empty");
@@ -453,7 +453,7 @@ class MilestoneController extends ApplicationController {
 		}
 		
 		$notAllowedMember = '';
-		if(!ProjectMilestone::canAdd(logged_user(), active_context(), $notAllowedMember)) {
+		if(!(new ProjectMilestone())->canAdd(logged_user(), active_context(), $notAllowedMember)) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the milestone'))) : flash_error(lang('no context permissions to add',lang("milestones"),$notAllowedMember));
 			ajx_current("empty");
@@ -496,7 +496,7 @@ class MilestoneController extends ApplicationController {
 		}
 		
 		$notAllowedMember = '';
-		if(!ProjectMilestone::canAdd(logged_user(), active_context(),$notAllowedMember)) {
+		if(!(new ProjectMilestone())->canAdd(logged_user(), active_context(),$notAllowedMember)) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the milestone'))) : flash_error(lang('no context permissions to add',lang("milestones"),$notAllowedMember));
 			ajx_current("empty");

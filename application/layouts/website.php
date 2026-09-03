@@ -174,7 +174,7 @@ $show_owner_company_name_header = config_option("show_owner_company_name_header"
 			<div class="clear"></div>
 			<?php echo render_user_box(logged_user())?>
 		</div>
-		<?php Hook::fire('render_page_header', null, $ret); 
+		<?php Hook::fire('render_page_header', null, $ret);
 			  Hook::fire('on_page_load', 'mail', $ret);
 		?>
         <script>
@@ -328,8 +328,7 @@ $show_owner_company_name_header = config_option("show_owner_company_name_header"
 <!-- /footer -->
 
 <script>
-		
-	
+
 // OG config options
 og.hostName = '<?php echo ROOT_URL ?>';
 og.sandboxName = <?php echo defined('SANDBOX_URL') ? "'".SANDBOX_URL."'" : 'false'; ?>;
@@ -554,7 +553,7 @@ og.objPickerTypeFilters = [];
 		$linkable = $type->getIsLinkableObjectType();
 		if ($linkable) {
 			$tab_ids = DB::executeAll("SELECT id FROM ".TABLE_PREFIX."tab_panels WHERE object_type_id = ".$type->getId());
-			if (count($tab_ids) > 0) {
+			if (is_array($tab_ids) && count($tab_ids) > 0) {
 				$tab_id = $tab_ids[0]['id'];
 				if (!TabPanelPermissions::isModuleEnabled($tab_id, implode(',', $pg_ids))) {
 					continue;
@@ -591,7 +590,7 @@ og.objPickerTypeFilters = [];
 ?>
 
 og.dimension_object_type_contents = [];
-<?php 
+<?php
 	$dotcs = DimensionObjectTypeContents::instance()->findAll();
 	foreach ($dotcs as $dotc) { /* @var $dotc DimensionObjectTypeContent */?>
 		var dim = <?php echo $dotc->getDimensionId() ?>;
@@ -648,6 +647,5 @@ $(document).ready(function() {
 	</div>
 </body>
 </html>
-
 <?php Hook::fire('page_rendered', null, $ret); ?>
 

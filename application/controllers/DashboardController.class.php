@@ -52,7 +52,7 @@ class DashboardController extends ApplicationController {
 		$trashed = array_var($_GET, 'trashed', false);
 		$archived = array_var($_GET, 'archived', false);
 
-		$pagination = ContentDataObjects::listing(array(
+		$pagination = (new GenericContentDataObjects())->listing(array(
 			"start" => $start,
 			"limit" => $limit,
 			"order" => $order,

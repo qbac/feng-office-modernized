@@ -235,7 +235,7 @@ class Workspace extends BaseWorkspace {
     	);
     }
     
-    function getIconClass() {
+    function getIconClass($large = false) {
     	$d = Dimensions::findByCode('workspaces');
     	$m = Members::findOneByObjectId($this->getId(), $d->getId());
     	

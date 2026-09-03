@@ -58,7 +58,7 @@
 	$year = date("Y");
 	// Loop to render the calendar
 	
-	$can_add_event = !active_project() || ProjectEvent::canAdd(logged_user(),active_project());	
+	$can_add_event = !active_project() || (new ProjectEvent())->canAdd(logged_user(),active_project());	
 					$output .= "<tr>";
 					
 					if(!user_config_option("start_monday")) {
@@ -167,7 +167,7 @@
 			//if($day_of_month >= 1){
 				$output .= "<a class='internalLink' href=\"$p\" onclick=\"og.disableEventPropagation(event);\"  style='color:#5B5B5B' >$w</a>";				
 				// only display this link if the user has permission to add an event
-				if(!active_project() || ProjectEvent::canAdd(logged_user(),active_project())){
+				if(!active_project() || (new ProjectEvent())->canAdd(logged_user(),active_project())){
 					// if single digit, add a zero
 					$dom = $day_of_month;
 					if($dom < 10) $dom = "0".$dom;

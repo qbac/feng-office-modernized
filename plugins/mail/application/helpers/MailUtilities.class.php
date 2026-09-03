@@ -690,7 +690,7 @@ class MailUtilities {
 			return '<a class="internalLink" href="'.$url.'" title="'.$email.'">'.$name." &lt;$email&gt;</a>";
 		} else {
 			$null = null;
-			if(!Contact::canAdd(logged_user(), active_context(), $null)) {
+			if(!(new Contact())->canAdd(logged_user(), active_context(), $null)) {
 				return $email;
 			} else {
 				if (trim($email) == "") return "";

@@ -3,7 +3,7 @@
   set_page_title(lang('milestones'));
   project_tabbed_navigation(PROJECT_TAB_MILESTONES);
   project_crumbs(lang('milestones'));
-  if(ProjectMilestone::canAdd(logged_user(), active_context())) {
+  if((new ProjectMilestone())->canAdd(logged_user(), active_context())) {
     add_page_action(lang('add milestone'), get_url('milestone', 'add'), 'ico-milestone');
   } // if
 

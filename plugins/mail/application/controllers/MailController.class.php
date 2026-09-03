@@ -1852,7 +1852,7 @@ class MailController extends ApplicationController {
 			ajx_current("empty");
 			return;
 		}
-		if(!MailAccount::canAdd(logged_user())) {
+		if(!(new MailAccount())->canAdd(logged_user())) {
 			flash_error(lang('no access permissions'));
 			ajx_current("empty");
 			return;

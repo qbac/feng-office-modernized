@@ -89,7 +89,7 @@ class ProjectMilestones extends BaseProjectMilestones {
 	 * @param ProjectMilestone $milestone
 	 * @return ProjectMilestone
 	 */
-	function createMilestoneCopy(ProjectMilestone $milestone) {
+	static function createMilestoneCopy(ProjectMilestone $milestone) {
 		$new = new ProjectMilestone();
 		$new->setObjectName($milestone->getObjectName());
 		$new->setDescription($milestone->getDescription());
@@ -104,7 +104,7 @@ class ProjectMilestones extends BaseProjectMilestones {
 	 * @param ProjectMilestone $milestoneFrom
 	 * @param ProjectMilestone $milestoneTo
 	 */
-	function copyTasks(ProjectMilestone $milestoneFrom, ProjectMilestone $milestoneTo, $as_template = false) {
+	static function copyTasks(ProjectMilestone $milestoneFrom, ProjectMilestone $milestoneTo, $as_template = false) {
 		//FIXME 
 		foreach ($milestoneFrom->getTasks($as_template) as $sub) {
 			if ($sub->getParentId() != 0) continue;
@@ -122,12 +122,12 @@ class ProjectMilestones extends BaseProjectMilestones {
 			
 			/*
 			foreach ($sub->getWorkspaces() as $workspace) {
-				if (ProjectTask::canAdd(logged_user(), $workspace)) {
+				if ((new ProjectTask())->canAdd(logged_user(), $workspace)) {
 					$new->addToWorkspace($workspace);
 				}
 			}
 
-			if (!$as_template && active_project() instanceof Project && ProjectTask::canAdd(logged_user(), active_project())) {
+			if (!$as_template && active_project() instanceof Project && (new ProjectTask())->canAdd(logged_user(), active_project())) {
 				$new->removeFromAllWorkspaces();
 				$new->addToWorkspace(active_project());
 			}
@@ -147,7 +147,7 @@ class ProjectMilestones extends BaseProjectMilestones {
 	 * @param DateTimeValue $date_start in user gmt
 	 * @param DateTimeValue $date_end	in user gmt	 * 
 	 */
-	function getRangeMilestones(DateTimeValue $date_start, DateTimeValue $date_end, $archived = false) {
+	static function getRangeMilestones(DateTimeValue $date_start, DateTimeValue $date_end, $archived = false) {
 		
 		$from_date = new DateTimeValue ( $date_start->getTimestamp () );
 		$from_date = $from_date->beginningOfDay ();

@@ -1,6 +1,6 @@
 <?php
   set_page_title(lang('forms'));
-  if(ProjectForm::canAdd(logged_user(), active_project())) {
+  if((new ProjectForm())->canAdd(logged_user(), active_project())) {
     add_page_action(lang('add form'), get_url('form', 'add'), 'ico-add');
   } // if
 

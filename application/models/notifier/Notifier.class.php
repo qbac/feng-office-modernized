@@ -25,7 +25,7 @@ class Notifier {
 	 */
 	static public $exchange_compatible = null;
 	
-	function notifyAction($object, $action, $log_data) {
+	static function notifyAction($object, $action, $log_data) {
 		
 		if (!$object instanceof ContentDataObject) {
 			return;
@@ -876,7 +876,7 @@ class Notifier {
 	 * @return boolean
 	 * @throws NotifierConnectionError
 	 */
-	function milestoneAssigned(ProjectMilestone $milestone) {
+	static function milestoneAssigned(ProjectMilestone $milestone) {
 		if($milestone->isCompleted()) {
 			return true; // milestone has been already completed...
 		} // if
@@ -913,7 +913,7 @@ class Notifier {
 	 * @return boolean
 	 * @throws NotifierConnectionError
 	 */
-	function taskAssigned(ProjectTask $task) {
+	static function taskAssigned(ProjectTask $task) {
 		if($task->isCompleted()) {
 			return true; // task has been already completed...
 		}
@@ -1056,7 +1056,7 @@ class Notifier {
 	} 
 
         
-	function workEstimate(ProjectTask $task) {
+	static function workEstimate(ProjectTask $task) {
 		tpl_assign('task_assigned', $task);
 		
 		if(!($task->getAssignedTo() instanceof Contact)) {
@@ -1495,7 +1495,7 @@ class Notifier {
 		} // if
 	} // getMailer
 
-	function sendReminders() {
+	static function sendReminders() {
 		include_once "application/cron_functions.php";
 		send_reminders();
 	}

@@ -323,6 +323,38 @@ function str_replace_first($search_for, $replace_with, $in) {
 } // str_replace_first
 
 /**
+ * Kompatybilne zamienniki dla funkcji ext/mysql (usuniętych w PHP 7), oparte o aktywne
+ * połączenie PDO z DB::connection() - zachowują identyczny kontrakt (brak cudzysłowów
+ * wokół wyniku escape'owania, żeby nie łamać istniejących zapytań budowanych jako '...'.$x.'...')
+ */
+if (!function_exists('mysql_real_escape_string')) {
+function mysql_real_escape_string($string, $link = null) {
+	$quoted = DB::connection()->getLink()->quote((string) $string);
+	return substr($quoted, 1, -1);
+} // end func mysql_real_escape_string
+}
+
+if (!function_exists('mysql_query')) {
+function mysql_query($query, $link = null) {
+	return DB::connection()->getLink()->query($query);
+} // end func mysql_query
+}
+
+if (!function_exists('mysql_fetch_array')) {
+function mysql_fetch_array($result, $type = null) {
+	if (!($result instanceof PDOStatement)) return false;
+	$row = $result->fetch(PDO::FETCH_BOTH);
+	return $row === false ? false : $row;
+} // end func mysql_fetch_array
+}
+
+if (!function_exists('mysql_error')) {
+function mysql_error($link = null) {
+	return DB::connection()->lastError();
+} // end func mysql_error
+}
+
+/**
  * String starts with something
  *
  * This function will return true only if input string starts with

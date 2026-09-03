@@ -895,7 +895,7 @@ class ContactController extends ApplicationController {
 			} 
 		} else {
 			$notAllowedMember = '';
-			if(!Contact::canAdd(logged_user(), active_context(), $notAllowedMember)) {
+			if(!(new Contact())->canAdd(logged_user(), active_context(), $notAllowedMember)) {
 				if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 				else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the contact'))) : flash_error(lang('no context permissions to add',lang("contacts"), $notAllowedMember));
 				ajx_current("empty");
@@ -1664,7 +1664,7 @@ class ContactController extends ApplicationController {
 			ajx_current("start");
 		} else {
 			
-			if(!Contact::canAdd(logged_user(), active_context())) {
+			if(!(new Contact())->canAdd(logged_user(), active_context())) {
 				flash_error(lang('no access permissions'));
 				ajx_current("empty");
 				return;
@@ -1741,7 +1741,7 @@ class ContactController extends ApplicationController {
 								$contact = new Contact();
 								$contact_data['import_status'] = '('.lang('new').')';
 								$log_action = ApplicationLogs::ACTION_ADD;
-								$can_import = Contact::canAdd(logged_user(), active_context());
+								$can_import = (new Contact())->canAdd(logged_user(), active_context());
 								
 							} else {
 								$can_import = $contact->canEdit(logged_user());
@@ -2115,7 +2115,7 @@ class ContactController extends ApplicationController {
 			ajx_current("start");
 		} else {
                 
-                    if(!Contact::canAdd(logged_user(), active_context())) {
+                    if(!(new Contact())->canAdd(logged_user(), active_context())) {
                             flash_error(lang('no access permissions'));
                             ajx_current("empty");
                             return;
@@ -2171,7 +2171,7 @@ class ContactController extends ApplicationController {
                                                     $contact = new Contact();
                                                     $contact_data['import_status'] = '('.lang('new').')';
                                                     $log_action = ApplicationLogs::ACTION_ADD;
-                                                    $can_import = Contact::canAdd(logged_user(), active_context());
+                                                    $can_import = (new Contact())->canAdd(logged_user(), active_context());
                                             } else {
                                                     $can_import = $contact->canEdit(logged_user());
                                             }
@@ -2901,7 +2901,7 @@ class ContactController extends ApplicationController {
 			return;
 		}
 		$notAllowedMember = '';				
-		if(!Contact::canAdd(logged_user(),active_context(),$notAllowedMember)) {
+		if(!(new Contact())->canAdd(logged_user(),active_context(),$notAllowedMember)) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the contact'))) : flash_error(lang('no context permissions to add',lang("contacts"), $notAllowedMember));
 			ajx_current("empty");

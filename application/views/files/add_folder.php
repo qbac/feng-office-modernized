@@ -1,7 +1,7 @@
 <?php
   set_page_title($folder->isNew() ? lang('add folder') : lang('edit folder'));
   
-  if(ProjectFile::canAdd(logged_user(), active_context())) {
+  if((new ProjectFile())->canAdd(logged_user(), active_context())) {
     add_page_action(lang('add file'), get_url('files', 'add_file'), 'ico-add');
   } // if
 

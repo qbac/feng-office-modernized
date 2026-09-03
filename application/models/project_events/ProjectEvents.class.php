@@ -24,7 +24,7 @@ class ProjectEvents extends BaseProjectEvents {
         function findByExtCalId($ext_cal_id) {
                 return ProjectEvents::instance()->findAll(array('conditions' => array('`ext_cal_id` = ?', $ext_cal_id)));
         }
-        function findById($id) {
+        function findById($id, $force_reload = false) {
         	return ProjectEvents::instance()->findOne(array('conditions' => array('`object_id` = ?', $id)));
         }
         function findNoSync($contact_id) {

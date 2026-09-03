@@ -953,7 +953,7 @@ class ObjectController extends ApplicationController {
 			if (array_var($_GET, 'action') == 'delete') {
 				$ids = explode(',', array_var($_GET, 'objects'));
 
-				$result = ContentDataObjects::listing(array(
+				$result = (new GenericContentDataObjects())->listing(array(
 					"extra_conditions" => " AND o.id IN (".implode(",",$ids).") ",
 					"include_deleted" => true
 				));
@@ -994,7 +994,7 @@ class ObjectController extends ApplicationController {
 
 			}else if (array_var($_GET, 'action') == 'empty_trash_can') {
 
-				$result = ContentDataObjects::listing(array(
+				$result = (new GenericContentDataObjects())->listing(array(
 					"select_columns" => array('id'),
 					"raw_data" => true,
 					"trashed" => true,
@@ -1157,7 +1157,7 @@ class ObjectController extends ApplicationController {
 		if($object_ids_filter == "" && $show_all_linked_objects){
 			$pagination = array();
 		}else{
-			$pagination = ContentDataObjects::listing(array(
+			$pagination = (new GenericContentDataObjects())->listing(array(
 				"start" => $start,
 				"limit" => $limit,
 				"order" => $order,

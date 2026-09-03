@@ -521,6 +521,7 @@ abstract class ContentDataObjects extends DataManager {
 					$total = DB::executeOne($sql_total);
 					$result->total = $total['total'];	
 				}else{
+					if (!is_array($result->objects)) $result->objects = array();
 					if  ( count($result->objects) >= $limit ) {
 						$result->total = 10000000;
 					}else{

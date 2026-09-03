@@ -1095,7 +1095,7 @@ class FilesController extends ApplicationController {
 		} else  {
 			// new document
 			$notAllowedMember = '';
-			if (!ProjectFile::canAdd(logged_user(), active_context(),$notAllowedMember)) {
+			if (!(new ProjectFile())->canAdd(logged_user(), active_context(),$notAllowedMember)) {
 				if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 				else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the file'))) : flash_error(lang('no context permissions to add',lang("documents"),$notAllowedMember));
 				ajx_current("empty");
@@ -1246,7 +1246,7 @@ class FilesController extends ApplicationController {
 		} else  {
 			// new presentation
 			$notAllowedMember = '';
-			if (!ProjectFile::canAdd(logged_user(), active_context(), $notAllowedMember)) {
+			if (!(new ProjectFile())->canAdd(logged_user(), active_context(), $notAllowedMember)) {
 				if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 				else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the file'))) : flash_error(lang('no context permissions to add',lang("presentations"),$notAllowedMember));
 				$this->redirectToReferer(get_url('files'));
@@ -1365,7 +1365,7 @@ class FilesController extends ApplicationController {
 			//new spreadsheet
 			if ($name == '') $name = lang('new spreadsheet');
 			try {
-				if(!ProjectFile::canAdd(logged_user() , active_context())) {
+				if(!(new ProjectFile())->canAdd(logged_user() , active_context())) {
 					flash_error(lang('no access permissions'));
 					$this->redirectToReferer(get_url('files'));
 					return ;
@@ -1527,7 +1527,7 @@ class FilesController extends ApplicationController {
 			}
 		} else {
 			//new document
-			if (!ProjectFile::canAdd(logged_user(), active_context(), $notAllowedMember )) {
+			if (!(new ProjectFile())->canAdd(logged_user(), active_context(), $notAllowedMember )) {
 				if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 				else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the file'))) : flash_error(lang('no context permissions to add', lang("documents"),$notAllowedMember));
 				ajx_current("empty");
@@ -1567,7 +1567,7 @@ class FilesController extends ApplicationController {
 			tpl_assign('file', $file);
 		} else {
 			// new spreadsheet
-			if (!ProjectFile::canAdd(logged_user(), active_context())) {
+			if (!(new ProjectFile())->canAdd(logged_user(), active_context())) {
 				flash_error(lang('no context permissions to add',lang("spreadsheets")));
 				ajx_current("empty");
 				return;
@@ -1625,7 +1625,7 @@ class FilesController extends ApplicationController {
 		} else {
 			//new presentation
 			$notAllowedMember = '' ;
-			if (!ProjectFile::canAdd(logged_user(), active_context(), $notAllowedMember)) {
+			if (!(new ProjectFile())->canAdd(logged_user(), active_context(), $notAllowedMember)) {
 				if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 				else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the file'))) : flash_error(lang('no context permissions to add',lang("presentations"), $notAllowedMember));
 				ajx_current("empty");

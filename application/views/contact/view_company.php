@@ -26,7 +26,7 @@
 		if ($company->canAddUser(logged_user())) {
 			add_page_action(lang('add user'), $company->getAddUserUrl(), 'ico-add');
 		} // if
-		if (Contact::canAdd(logged_user(), $company->getMembers())) {
+		if ((new Contact())->canAdd(logged_user(), $company->getMembers())) {
 			add_page_action(lang('add contact'), $company->getAddContactUrl(), 'ico-add');
 		} // if
 		if ($company->canEdit(logged_user())) {

@@ -76,7 +76,7 @@ if ($calendar_panel instanceof TabPanel && $calendar_panel->getEnabled()) {
 	$year = date("Y");
 	// Loop to render the calendar
 	
-	$can_add_event = ProjectEvent::canAdd(logged_user(), active_context());
+	$can_add_event = (new ProjectEvent())->canAdd(logged_user(), active_context());
 	$output .= "<tr>";
 	
 	if(!user_config_option("start_monday")) {
@@ -197,7 +197,7 @@ if ($calendar_panel instanceof TabPanel && $calendar_panel->getEnabled()) {
 			//if($day_of_month >= 1){
 				$output .= "<a class='internalLink' href=\"$p\" onclick=\"og.disableEventPropagation(event);\"  style='color:#5B5B5B' >$w</a>";				
 				// only display this link if the user has permission to add an event
-				if(ProjectEvent::canAdd(logged_user(),active_context())){
+				if((new ProjectEvent())->canAdd(logged_user(),active_context())){
 					// if single digit, add a zero
 					$dom = $day_of_month;
 					if($dom < 10) $dom = "0".$dom;

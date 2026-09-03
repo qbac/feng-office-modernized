@@ -479,7 +479,7 @@ class MemberController extends ApplicationController {
 					$dimension_obj_data = array_var($_POST, 'dim_obj');
 					if (!array_var($dimension_obj_data, 'name')) $dimension_obj_data['name'] = $member->getName();
 					
-					eval('$fields = '.$handler_class.'::getPublicColumns();');
+					$fields = $handler_class::instance()->getPublicColumns();
 					foreach ($fields as $field) {
 						if (array_var($field, 'type') == DATA_TYPE_DATETIME) {
 							$dimension_obj_data[$field['col']] = getDateValue($dimension_obj_data[$field['col']]);
@@ -829,7 +829,7 @@ class MemberController extends ApplicationController {
 		}
 		
 		$handler_class = $object_type->getHandlerClass();
-		eval('$fields = '.$handler_class.'::getPublicColumns();');
+		$fields = $handler_class::instance()->getPublicColumns();
 		
 		if (get_id('mem_id') > 0) {
 			$date_format = user_config_option('date_format');

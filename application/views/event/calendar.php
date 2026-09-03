@@ -213,7 +213,7 @@ foreach($companies as $company)
 					}
 					$all_events = array_merge($all_events, array_flat($repeated_instances));
 					
-					$can_add_events = ProjectEvent::canAdd(logged_user(), active_context());
+					$can_add_events = (new ProjectEvent())->canAdd(logged_user(), active_context());
 					
 					// Loop to render the calendar
 					for ($week_index = 0;; $week_index++) {

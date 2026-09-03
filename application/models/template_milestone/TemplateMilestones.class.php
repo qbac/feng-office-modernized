@@ -117,12 +117,12 @@ class TemplateMilestones extends BaseTemplateMilestones {
 			
 			/*
 			foreach ($sub->getWorkspaces() as $workspace) {
-				if (TemplateTask::canAdd(logged_user(), $workspace)) {
+				if ((new TemplateTask())->canAdd(logged_user(), $workspace)) {
 					$new->addToWorkspace($workspace);
 				}
 			}
 
-			if (!$as_template && active_project() instanceof Project && TemplateTask::canAdd(logged_user(), active_project())) {
+			if (!$as_template && active_project() instanceof Project && (new TemplateTask())->canAdd(logged_user(), active_project())) {
 				$new->removeFromAllWorkspaces();
 				$new->addToWorkspace(active_project());
 			}

@@ -532,7 +532,6 @@ class DimensionController extends ApplicationController {
 		$mem = Members::getMemberById($mem_id);
 		if($mem instanceof Member){
 			$parents = $mem->getAllParentMembersInHierarchy(true);
-			
 			$members = $this->buildMemberList($parents, $mem->getDimension(),  null, null, null, null);
 			
 			ajx_extra_data(array("member_id" => $mem_id));
@@ -560,7 +559,7 @@ class DimensionController extends ApplicationController {
 			}else{
 				$selectable = true ;
 			}
-			if ( count($allowed_member_type_ids) && !in_array($m->getObjectTypeId(), $allowed_member_type_ids) ) {
+			if ( is_array($allowed_member_type_ids) && count($allowed_member_type_ids) && !in_array($m->getObjectTypeId(), $allowed_member_type_ids) ) {
 				continue;	
 			}
 			$tempParent = $m->getParentMemberId();
@@ -586,7 +585,7 @@ class DimensionController extends ApplicationController {
 			}
 			
 			$memberOptions = '';
-			
+
 			// SET member options (dimension object types table)
 			// CHeck dot cache, if not set goto database and add to cache
 			if ( empty($dot_array[$dimension->getId()]) || empty ($dot_array[$dimension->getId()][$m->getObjectTypeId()]) ) {
@@ -620,7 +619,7 @@ class DimensionController extends ApplicationController {
 					$childsIds = ContactMemberCaches::getAllChildrenIdsFromCache(logged_user()->getId(), $m->getId());
 				}else{
 					$childsIds = $m->getAllChildrenIds(false,null,"");
-				}				
+				}
 				$totalChilds = count($childsIds);
 				$haveChilds = ($totalChilds > 0)? true : false; 
 				

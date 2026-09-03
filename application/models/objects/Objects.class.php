@@ -20,7 +20,7 @@
     	if (!$object_type instanceof ObjectType) return null;
     	$handler_class = $object_type->getHandlerClass();
     	
-    	eval('$concrete_object = '.$handler_class.'::findById('.$object_id.');');
+    	$concrete_object = $handler_class::instance()->findById($object_id);
     	
     	$object_type = null;
     	$object = null;

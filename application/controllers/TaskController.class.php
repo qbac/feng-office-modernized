@@ -46,7 +46,7 @@ class TaskController extends ApplicationController {
 		}
 		
 		$notAllowedMember = '' ;
-		if(!ProjectTask::canAdd(logged_user(), active_context(), $notAllowedMember)) {
+		if(!(new ProjectTask())->canAdd(logged_user(), active_context(), $notAllowedMember)) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the task'))) : flash_error(lang('no context permissions to add',lang("tasks"), $notAllowedMember));
 			ajx_current("empty");
@@ -1068,7 +1068,7 @@ class TaskController extends ApplicationController {
 			
 			tpl_assign('userPreferences', $userPref);
 			
-			tpl_assign('userPermissions', array('can_add' => ProjectTask::canAdd(logged_user(), active_context()) ? 1 : 0));
+			tpl_assign('userPermissions', array('can_add' => (new ProjectTask())->canAdd(logged_user(), active_context()) ? 1 : 0));
 			
 			ajx_set_no_toolbar(true);
 		}
@@ -1167,7 +1167,7 @@ class TaskController extends ApplicationController {
 		}
 
 		$notAllowedMember = '' ;
-		if(!ProjectTask::canAdd(logged_user(), active_context(), $notAllowedMember) && !$isTemplateTask) {
+		if(!(new ProjectTask())->canAdd(logged_user(), active_context(), $notAllowedMember) && !$isTemplateTask) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the task'))) : flash_error(lang('no context permissions to add',lang("tasks"), $notAllowedMember));
 			ajx_current("empty");
@@ -1489,7 +1489,7 @@ class TaskController extends ApplicationController {
 		}
 		
 		$notAllowedMember = '';
-		if(!ProjectTask::canAdd(logged_user(), active_context(),$notAllowedMember)) {
+		if(!(new ProjectTask())->canAdd(logged_user(), active_context(),$notAllowedMember)) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the task'))) : flash_error(lang('no context permissions to add',lang("tasks"), $notAllowedMember));
 			ajx_current("empty");
@@ -2351,7 +2351,7 @@ class TaskController extends ApplicationController {
 		}
 		
 		$notAllowedMember = '';
-		if(!ProjectTask::canAdd(logged_user(), active_context(), $notAllowedMember)) {
+		if(!(new ProjectTask())->canAdd(logged_user(), active_context(), $notAllowedMember)) {
 			if (str_starts_with($notAllowedMember, '-- req dim --')) flash_error(lang('must choose at least one member of', str_replace_first('-- req dim --', '', $notAllowedMember, $in)));
 			else trim($notAllowedMember) == "" ? flash_error(lang('you must select where to keep', lang('the task'))) : flash_error(lang('no context permissions to add',lang("tasks"), $notAllowedMember));
 			ajx_current("empty");

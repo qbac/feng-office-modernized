@@ -54,7 +54,7 @@ class Comment extends BaseComment {
 	 * @param void
 	 * @return integer
 	 */
-	function getCommentNum() {
+	function getCommentNum(?Comment $comment = null) {
 		if(is_null($this->comment_num)) {
 			$object = $this->getRelObject();
 			$this->comment_num = $object instanceof ContentDataObject ? $object->getCommentNum($this) : 0;

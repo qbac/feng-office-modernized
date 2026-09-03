@@ -36,7 +36,8 @@ class ObjectType extends BaseObjectType {
 		try {
 			eval('$item_class = '.$handler_class.'::instance()->getItemClass();  $instance = new $item_class();');
 			return $instance && $instance->isLinkableObject();
-		}catch(Exception $e) {
+		}catch(Throwable $e) {
+			Logger::log($e, Logger::ERROR);
 			return false ;
 		}
 	}

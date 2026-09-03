@@ -47,7 +47,7 @@ $users = array();
 
 if (count($overdue_upcoming_objects) > 0) {
 	// Render only when the context isnt 'all' and you have perms 
-	$render_add = active_context_members(false) && ProjectTask::canAdd(logged_user(), active_context());
+	$render_add = active_context_members(false) && (new ProjectTask())->canAdd(logged_user(), active_context());
 	
 	if ($render_add) {
 		$users[] = array(0, lang('dont assign'));	

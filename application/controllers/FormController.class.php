@@ -23,7 +23,7 @@ class FormController extends ApplicationController {
 	function index() {
 		$this->addHelper('textile');
 
-		if(!ProjectForm::canAdd(logged_user(), active_project())) {
+		if(!(new ProjectForm())->canAdd(logged_user(), active_project())) {
 			flash_error(lang('no access permissions'));
 			$this->redirectToReferer(active_project()->getOverviewUrl());
 		} // if
@@ -103,7 +103,7 @@ class FormController extends ApplicationController {
 	function add() {
 		$this->setTemplate('add_project_form');
 
-		if(!ProjectForm::canAdd(logged_user(), active_project())) {
+		if(!(new ProjectForm())->canAdd(logged_user(), active_project())) {
 			flash_error(lang('no access permissions'));
 			$this->redirectToReferer(active_project()->getOverviewUrl());
 		} // if
@@ -168,7 +168,7 @@ class FormController extends ApplicationController {
 		$project_form = ProjectForms::instance()->findById(get_id());
 		if(!($project_form instanceof ProjectForm)) {
 			flash_error(lang('project form dnx'));
-			if(ProjectForm::canAdd(logged_user(), active_project())) {
+			if((new ProjectForm())->canAdd(logged_user(), active_project())) {
 				$this->redirectTo('form');
 			} else {
 				$this->redirectToUrl(active_project()->getOverviewUrl());
@@ -177,7 +177,7 @@ class FormController extends ApplicationController {
 
 		if(!$project_form->canEdit(logged_user())) {
 			flash_error(lang('no access permissions'));
-			if(ProjectForm::canAdd(logged_user(), active_project())) {
+			if((new ProjectForm())->canAdd(logged_user(), active_project())) {
 				$this->redirectTo('form');
 			} else {
 				$this->redirectToUrl(active_project()->getOverviewUrl());
@@ -247,7 +247,7 @@ class FormController extends ApplicationController {
 		$project_form = ProjectForms::instance()->findById(get_id());
 		if(!($project_form instanceof ProjectForm)) {
 			flash_error(lang('project form dnx'));
-			if(ProjectForm::canAdd(logged_user(), active_project())) {
+			if((new ProjectForm())->canAdd(logged_user(), active_project())) {
 				$this->redirectTo('form');
 			} else {
 				$this->redirectToUrl(active_project()->getOverviewUrl());
@@ -256,7 +256,7 @@ class FormController extends ApplicationController {
 
 		if(!$project_form->canDelete(logged_user())) {
 			flash_error(lang('no access permissions'));
-			if(ProjectForm::canAdd(logged_user(), active_project())) {
+			if((new ProjectForm())->canAdd(logged_user(), active_project())) {
 				$this->redirectTo('form');
 			} else {
 				$this->redirectToUrl(active_project()->getOverviewUrl());
