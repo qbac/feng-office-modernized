@@ -7,6 +7,42 @@ Najnowsze zmiany na górze.
 
 ## [Nieopublikowane]
 
+## 2026-09-03 (część 9): Administracja i Konto naprawione naprawdę
+
+Poprzednia naprawa (część 7) testowała akcje kontrolerów bezpośrednim wywołaniem metod, co
+pomijało krok renderowania widoku/layoutu — realny błąd (zgłoszenie: "Administracja i Konto w
+ogóle nie działają") siedział właśnie tam. Nowa metoda diagnozy: skrypt CLI przez
+`Env::executeAction()` (ta sama ścieżka co prawdziwy request), z `define('CONSOLE_MODE', false)`
+— `defined('CONSOLE_MODE')` prawdziwe (init.php pomija własny auto-dispatch), ale `CONSOLE_MODE`
+fałszywe (`prepare_company_website_controller()` nie robi wtedy wczesnego `return` i normalnie
+ustawia layout — inaczej niż `CONSOLE_MODE = true`, które psuje ten krok i daje fałszywe
+"layout nie istnieje"). Każda akcja testowana w osobnym procesie PHP, żeby uniknąć fałszywych
+"OK" od statycznych singletonów (`AjaxResponse::instance()` itp.) trzymających dane z
+poprzedniego wywołania w tym samym procesie.
+
+### Naprawione
+- `application/views/administration/index.php` — `if (count($icons > 0))` (literówka: porównanie
+  wewnątrz `count()` zamiast na jego wyniku) w dwóch miejscach. Pierwsze miało puste ciało `{}`
+  (martwy kod, usunięte), drugie faktycznie renderowało siatkę ikon administracji (naprawione na
+  `count($icons) > 0`) — to był realny blocker całej strony głównej Administracji.
+- `application/controllers/AccountController.class.php` (`index()`) — `setTemplate("card")` +
+  `setControllerName("user")` wskazywały na nieistniejący plik `application/views/user/card.php`.
+  Właściwy widok istnieje pod `application/views/contact/user_card.php` (dokładnie te same
+  zmienne: `$user`, `$logs`) — najwyraźniej plik/katalog `user/` w oryginalnym Feng Office nigdy
+  nie istniał w tej gałęzi kodu albo został przemianowany na `contact/user_card.php` bez
+  aktualizacji tego jedynego miejsca, które go używało (`setControllerName("user")` nie występuje
+  nigdzie indziej w kodzie). Poprawione na `setTemplate("user_card")` / `setControllerName("contact")`.
+- `application/views/administration/members.php` — `Contact::canAddUser(logged_user())` wołane
+  statycznie (metoda nie używa `$this`, ten sam wzorzec co `canAdd()` gdzie indziej) →
+  `(new Contact())->canAddUser(logged_user())`.
+- Przy okazji, ten sam typo `count($x > 0)` znaleziony i naprawiony w dwóch dalszych miejscach
+  (grep całego `application/`): `application/controllers/TemplateController.class.php:513`,
+  `application/models/ContentDataObjects.class.php:916` — oba z niepustym ciałem `if`, czyli
+  realne blockery (kopiowanie szablonów obiektów / listowanie timeslotów), nie tylko kosmetyka.
+
+Zweryfikowane: wszystkie 13 akcji `AdministrationController` i 4 przetestowane akcje
+`AccountController` renderują się bez `Throwable`, każda w osobnym procesie PHP.
+
 ## 2026-09-03 (część 8): wersjonowanie forka
 
 Dodane: plik `VERSION` (SemVer) w root repo, stała `FORK_VERSION` w `init.php` czytana z tego

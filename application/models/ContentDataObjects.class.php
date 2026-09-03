@@ -913,7 +913,7 @@ abstract class ContentDataObjects extends DataManager {
 				$objects_list[$i]->timeslots = array();
 				$objects_list[$i]->timeslots_count = 0;
 			}
-			if (count($ids > 0)){
+			if (count($ids) > 0){
 				$result = Timeslots::instance()->listing(array(
 					"extra_conditions" => ' AND `e`.`object_id` in (' . implode(',', $ids) . ')'
 				));

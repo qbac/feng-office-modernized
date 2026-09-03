@@ -32,8 +32,8 @@ class AccountController extends ApplicationController {
 	 */
 	function index() {
 		$this->setHelp("account");
-		$this->setTemplate("card");
-		$this->setControllerName("user");
+		$this->setTemplate("user_card");
+		$this->setControllerName("contact");
 		tpl_assign('user', logged_user());
 		ajx_set_no_toolbar(true);
 		

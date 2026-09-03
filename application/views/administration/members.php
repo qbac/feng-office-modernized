@@ -1,7 +1,7 @@
 <?php
   set_page_title(lang('members'));
   
- if(Contact::canAddUser(logged_user())) {
+ if((new Contact())->canAddUser(logged_user())) {
     add_page_action(lang('add user'), owner_company()->getAddUserUrl(), 'ico-add',null,null,true);
   } // if
 ?>

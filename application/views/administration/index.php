@@ -140,7 +140,6 @@ if (defined("PLUGIN_MANAGER") && PLUGIN_MANAGER && can_manage_plugins(logged_use
 }
 
 Hook::fire('render_administration_icons', null, $icons);
-if (count($icons > 0)) {}
 ?>
 <div class="adminIndex" style="height:100%;background-color:white">
   <div class="adminHeader">
@@ -153,7 +152,7 @@ if (count($icons > 0)) {}
 
 <?php
 // print administration icons
-if (count($icons > 0)) {?>
+if (count($icons) > 0) {?>
 <table><tr>
 <?php $count = 0;
 foreach ($icons as $icon) {

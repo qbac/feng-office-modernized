@@ -510,7 +510,7 @@ class TemplateController extends ApplicationController {
 		
 		$objects = $template->getObjects() ;
 		$controller  = new ObjectController();
-		if (count($selected_members > 0)) {
+		if (count($selected_members) > 0) {
 			$selected_members_instances = Members::instance()->findAll(array('conditions' => 'id IN ('.implode($selected_members).')'));
 		} else {
 			$selected_members_instances = array();
