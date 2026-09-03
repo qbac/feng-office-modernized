@@ -64,10 +64,14 @@ class ProjectTasks extends BaseProjectTasks {
 		$conditions = " `is_template` = true $archived_cond";
 		if ($only_parent_task_templates)
 			$conditions .= "  and `parent_id` = 0  ";
-		$order_by = "`title` ASC";
-		$tasks = ProjectTasks::instance()->find ( array ('conditions' => $conditions, 'order' => $order_by ) );
+		// `title` nie jest kolumna tabeli project_tasks (tytul zyje w powiazanej tabeli
+		// objects.name, bez JOIN-a w tym find()) - sortowanie po stronie PHP zamiast w SQL
+		$tasks = ProjectTasks::instance()->find ( array ('conditions' => $conditions ) );
 		if (! is_array ( $tasks ))
 			$tasks = array ();
+		usort($tasks, function($a, $b) {
+			return strcasecmp($a->getObjectName(), $b->getObjectName());
+		});
 		return $tasks;
 	}
 	

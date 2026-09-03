@@ -13,19 +13,19 @@
     * @param void
     * @return array
     */
-    function getAll() {
+    static function getAll() {
       return self::instance()->findAll(array(
         'order' => '`order`'
       )); // findAll
     } // getAll
-    
+
     /**
     * Return tool by name
     *
     * @param string $name
     * @return AdministrationTool
     */
-    function getByName($name) {
+    static function getByName($name) {
       return self::instance()->findOne(array(
         'conditions' => array('`name` = ?', $name),
       )); // findOne

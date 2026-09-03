@@ -7,6 +7,31 @@ Najnowsze zmiany na górze.
 
 ## [Nieopublikowane]
 
+## 2026-09-03 (część 7): naprawa Administracji i Konta
+
+Zgłoszenie: sekcje "Administracja" i "Konto" w ogóle nie działały po zalogowaniu. Metoda
+diagnozy: skrypt CLI ładujący `init.php` z `CONSOLE_MODE` (pomija automatyczny dispatch),
+symulujący zalogowanego użytkownika przez `CompanyWebsite::instance()->setLoggedUser()`, wołający
+kolejno każdą akcję obu kontrolerów bezpośrednio i łapiący `Throwable` — ta sama metoda co przy
+diagnozie "pustego body" w części 1, tylko usystematyzowana w pętli po wszystkich akcjach zamiast
+punktowych sprawdzeń.
+
+### Naprawione
+- `application/models/config_categories/ConfigCategories.class.php` (`getAll()`) — brak `static`,
+  metoda nie używa `$this` (blokowało `AdministrationController::configuration()`).
+- `application/models/administration_tools/AdministrationTools.class.php` (`getAll()`,
+  `getByName()`) — jw., brak `static` (blokowało `AdministrationController::tools()`).
+- `application/models/project_tasks/ProjectTasks.class.php`
+  (`getAllTaskTemplates()`) — `ORDER BY \`title\`` w SQL, ale `title` nie jest kolumną tabeli
+  `project_tasks` (tytuł żyje w `objects.name`, a to zapytanie nie robi JOIN-a z `objects`) —
+  błąd `Column not found: 1054 Unknown column 'title'`. To NIE jest regresja migracji PHP 8.4,
+  tylko pre-istniejący bug (nieprawidłowa kolumna w ORDER BY istniała już w oryginalnym kodzie,
+  po prostu nigdy wcześniej nie trafiona). Naprawione przez usunięcie `ORDER BY` z SQL i sortowanie
+  wyniku w PHP po `getObjectName()` (`usort` + `strcasecmp`), zamiast dorabiać JOIN do zapytania.
+
+Zweryfikowane: wszystkie akcje `AdministrationController` (13) i przetestowane akcje
+`AccountController` (7) wykonują się bez `Throwable` w powyższym skrypcie diagnostycznym.
+
 ## 2026-09-03 (część 6): zgodność z AGPLv3 przed publikacją na GitHubie
 
 Feng Office jest na licencji AGPLv3 (`license.txt`) — jej klauzula sieciowa obowiązuje niezależnie
