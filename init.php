@@ -65,6 +65,9 @@ if(!is_bool($config_is_set) || !$config_is_set) {
 // ---------------------------------------------------
 
 if (!defined('FILES_DIR')) define('FILES_DIR', ROOT . '/upload'); // place where we will upload project files
+// Wersja tego forka (niezalezna od version.php, ktorego uzywaja skrypty public/upgrade/ do
+// porownan z wersja Feng Office) - trzymana w pliku VERSION, aktualizowana razem z tagiem gita.
+define('FORK_VERSION', is_file(ROOT . '/VERSION') ? trim(file_get_contents(ROOT . '/VERSION')) : 'dev');
 define('PRODUCT_NAME', 'Feng Office');
 define('PRODUCT_URL', 'http://www.fengoffice.com');
 define('DEFAULT_HELP_LINK', 'http://fengoffice.com/web/wiki');

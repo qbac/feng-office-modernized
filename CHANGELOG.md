@@ -7,6 +7,13 @@ Najnowsze zmiany na górze.
 
 ## [Nieopublikowane]
 
+## 2026-09-03 (część 8): wersjonowanie forka
+
+Dodane: plik `VERSION` (SemVer) w root repo, stała `FORK_VERSION` w `init.php` czytana z tego
+pliku, wyświetlana w stopce obok linku do kodu źródłowego. Niezależne od `version.php`
+(pozostawionego bez zmian — porównują się do niego skrypty `public/upgrade/`). Od teraz release
+= aktualizacja `VERSION` + tag gita (`vX.Y.Z`) + wpis w tym pliku.
+
 ## 2026-09-03 (część 7): naprawa Administracji i Konta
 
 Zgłoszenie: sekcje "Administracja" i "Konto" w ogóle nie działały po zalogowaniu. Metoda
