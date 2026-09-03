@@ -1185,7 +1185,7 @@ class Contact extends BaseContact {
 		
 		$deletedOn = $this->getTrashedOn () instanceof DateTimeValue ? ($this->getTrashedOn ()->isToday () ? format_time ( $this->getTrashedOn () ) : format_datetime ( $this->getTrashedOn (), 'M j' )) : lang ( 'n/a' );
 		if ($this->getTrashedById () > 0)
-			$deletedBy = Contacts::findById ( $this->getTrashedById () );
+			$deletedBy = Contacts::instance()->findById ( $this->getTrashedById () );
 		if (isset ( $deletedBy ) && $deletedBy instanceof Contact) {
 			$deletedBy = $deletedBy->getObjectName ();
 		} else {
@@ -1194,7 +1194,7 @@ class Contact extends BaseContact {
 		
 		$archivedOn = $this->getArchivedOn () instanceof DateTimeValue ? ($this->getArchivedOn ()->isToday () ? format_time ( $this->getArchivedOn () ) : format_datetime ( $this->getArchivedOn (), 'M j' )) : lang ( 'n/a' );
 		if ($this->getArchivedById () > 0)
-			$archivedBy = Contacts::findById ( $this->getArchivedById () );
+			$archivedBy = Contacts::instance()->findById ( $this->getArchivedById () );
 		if (isset ( $archivedBy ) && $archivedBy instanceof Contact) {
 			$archivedBy = $archivedBy->getObjectName ();
 		} else {

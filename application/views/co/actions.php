@@ -40,7 +40,7 @@
 				}
 			} // foreach			
 		 }
-		 PageActions::clearActions(); ?>
+		 PageActions::instance()->clearActions(); ?>
 		</td>
 	</tr>
 	<tr>

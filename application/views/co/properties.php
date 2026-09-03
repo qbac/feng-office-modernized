@@ -251,7 +251,7 @@
 		
 	</div>
 	
-	<?php Hook::fire("render_object_properties", $object, $ret = 0);?>
+	<?php $ret = 0; Hook::fire("render_object_properties", $object, $ret);?>
 		</td>
 	</tr>
 	

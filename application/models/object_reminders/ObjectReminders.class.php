@@ -13,7 +13,7 @@ class ObjectReminders extends BaseObjectReminders {
 	 * @param ContentDataObject $object
 	 * @param Contact $user
 	 */
-	function getAllRemindersByObjectAndUser($object, $user, $context = null, $include_subscriber_reminders = false) {
+	static function getAllRemindersByObjectAndUser($object, $user, $context = null, $include_subscriber_reminders = false) {
 		if (isset($context)) {
 			$extra = ' AND `context` = ' . DB::escape($context);
 		} else {
@@ -37,14 +37,14 @@ class ObjectReminders extends BaseObjectReminders {
 	 * @param $object
 	 * @return unknown_type
 	 */
-	function getByObject($object) {
+	static function getByObject($object) {
 		return self::instance()->findAll(array(
 			'conditions' => array("`object_id` = ?",
 				$object->getId()
 		)));
 	}
 	
-	function getDueReminders($type = null) {
+	static function getDueReminders($type = null) {
 		if (isset($type)) {
 			$extra = ' AND `type` = ' . DB::escape($type);
 		} else {
@@ -131,7 +131,7 @@ class ObjectReminders extends BaseObjectReminders {
 		return ObjectReminders::instance()->delete('`contact_id` = ' . DB::escape($user->getId()));
 	} // clearByUser
         
-        function findByEvent($event_id) {
+        static function findByEvent($event_id) {
                 return ObjectReminders::instance()->findAll(array('conditions' => array('`object_id` = ?', $event_id)));
         }
 

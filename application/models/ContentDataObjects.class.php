@@ -903,7 +903,7 @@ abstract class ContentDataObjects extends DataManager {
     
     
     
-	function populateTimeslots($objects_list){
+	static function populateTimeslots($objects_list){
 		if (is_array($objects_list) && count($objects_list) > 0 && $objects_list[0]->allowsTimeslots() && $objects_list[0] instanceof ContentDataObject){
 			$ids = array();
 			$objects = array();

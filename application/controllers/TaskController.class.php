@@ -928,7 +928,7 @@ class TaskController extends ApplicationController {
 			"count_results" => false,
 			"raw_data" => true,
 		))->objects;
-		
+
 		$pendingstr = $status == 0 ? " AND `completed_on` = " . DB::escape(EMPTY_DATETIME) . " " : "";
 		$milestone_conditions = " AND `is_template` = false " . $pendingstr;
 		
@@ -974,7 +974,7 @@ class TaskController extends ApplicationController {
 		$ext_milestone_conditions = " `is_template` = false " . $pendingstr . ' AND `object_id` IN (' . implode(',',$milestone_ids) . ')';
 
 		$externalMilestones = ProjectMilestones::instance()->findAll(array('conditions' => $ext_milestone_conditions));
-		
+
 		// Get Users Info
 		if (logged_user()->isGuest()) {
 			$users = array(logged_user());
@@ -999,7 +999,7 @@ class TaskController extends ApplicationController {
 			)
 		));
         tpl_assign('tasks', $tasks);
-        
+
         if (config_option('use tasks dependencies')) {
         	$dependency_count = array();
         	if (is_array($tasks)) {
@@ -1020,7 +1020,7 @@ class TaskController extends ApplicationController {
         }
         
 		if (!$isJson){
-			
+
 			$all_templates = COTemplates::instance()->findAll(array('conditions' => '`trashed_by_id` = 0 AND `archived_by_id` = 0'));
 			
 			tpl_assign('all_templates', $all_templates);
@@ -1069,7 +1069,6 @@ class TaskController extends ApplicationController {
 			tpl_assign('userPreferences', $userPref);
 			
 			tpl_assign('userPermissions', array('can_add' => (new ProjectTask())->canAdd(logged_user(), active_context()) ? 1 : 0));
-			
 			ajx_set_no_toolbar(true);
 		}
 	}

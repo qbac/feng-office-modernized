@@ -39,7 +39,7 @@ class Timeslot extends BaseTimeslot {
 	 * @param void
 	 * @return integer
 	 */
-	function getTimeslotNum() {
+	function getTimeslotNum(?Timeslot $timeslot = null) {
 		if(is_null($this->timeslot_num)) {
 			$object = $this->getRelObject();
 			$this->timeslot_num = $object instanceof ContentDataObject ? $object->getTimeslotNum($this) : 0;

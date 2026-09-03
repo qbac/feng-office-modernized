@@ -56,7 +56,7 @@
 			$data['isread'] = isset($read_objects[$data['id']]);
 		}
 	}
-	
+
 	if (is_array($internalMilestones)) {
 		foreach($internalMilestones as $milestone) {
 			$internal_milestones_array[] = $milestone->getArrayInfo();
@@ -97,7 +97,6 @@
 	foreach($object_subtypes as $ot) {
 		$object_subtypes_array[] = $ot->getArrayInfo();
 	}
-	
 	if (!isset($dependency_count)) $dependency_count = array();
 ?>
 

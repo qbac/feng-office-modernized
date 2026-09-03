@@ -2342,7 +2342,7 @@ class Net_IDNA_php4
         $delim_pos = strrpos($encoded, '-');
         if ($delim_pos > strlen($this->_punycode_prefix)) {
             for ($k = strlen($this->_punycode_prefix); $k < $delim_pos; ++$k) {
-                $decoded[] = ord($encoded{$k});
+                $decoded[] = ord($encoded[$k]);
             }
         } else {
             $decoded = array();
@@ -2358,7 +2358,7 @@ class Net_IDNA_php4
 
         for ($enco_idx = ($delim_pos) ? ($delim_pos + 1) : 0; $enco_idx < $enco_len; ++$deco_len) {
             for ($old_idx = $idx, $w = 1, $k = $this->_base; 1 ; $k += $this->_base) {
-                $digit = $this->_decode_digit($encoded{$enco_idx++});
+                $digit = $this->_decode_digit($encoded[$enco_idx++]);
                 $idx += $digit * $w;
                 $t = ($k <= $bias) ? $this->_tmin :
                         (($k >= $bias + $this->_tmax) ? $this->_tmax : ($k - $bias));
@@ -2781,7 +2781,7 @@ class Net_IDNA_php4
         $mode = 'next';
         $test = 'none';
         for ($k = 0; $k < $inp_len; ++$k) {
-            $v = ord($input{$k}); // Extract byte from input string
+            $v = ord($input[$k]); // Extract byte from input string
 
             if ($v < 128) { // We found an ASCII char - put into stirng as is
                 $output[$out_len] = $v;
@@ -2924,7 +2924,7 @@ class Net_IDNA_php4
                 $out_len++;
                 $output[$out_len] = 0;
             }
-            $output[$out_len] += ord($input{$i}) << (8 * (3 - ($i % 4) ) );
+            $output[$out_len] += ord($input[$i]) << (8 * (3 - ($i % 4) ) );
         }
         return $output;
     }

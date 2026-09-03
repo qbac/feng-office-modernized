@@ -10,7 +10,7 @@ function workspaces_total_task_timeslots_group_by_criterias($args, &$ret) {
 
 
 function workspaces_custom_reports_additional_columns($args, &$ret) {
-	$dimensions = Dimensions::findAll ( array("conditions" => "code IN ('workspaces','tags')") );
+	$dimensions = Dimensions::instance()->findAll ( array("conditions" => "code IN ('workspaces','tags')") );
 	foreach ($dimensions as $dimension) {
 		$doptions = $dimension->getOptions(true);
 		

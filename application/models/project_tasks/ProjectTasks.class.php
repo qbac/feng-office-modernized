@@ -65,13 +65,13 @@ class ProjectTasks extends BaseProjectTasks {
 		if ($only_parent_task_templates)
 			$conditions .= "  and `parent_id` = 0  ";
 		$order_by = "`title` ASC";
-		$tasks = ProjectTasks::find ( array ('conditions' => $conditions, 'order' => $order_by ) );
+		$tasks = ProjectTasks::instance()->find ( array ('conditions' => $conditions, 'order' => $order_by ) );
 		if (! is_array ( $tasks ))
 			$tasks = array ();
 		return $tasks;
 	}
 	
-	function maxOrder($parentId = null, $milestoneId = null) {
+	static function maxOrder($parentId = null, $milestoneId = null) {
 		$condition = "`trashed_on` = 0 AND `is_template` = false AND `archived_on` = 0";
 		if (is_numeric ( $parentId )) {
 			$condition .= " AND ";
@@ -102,7 +102,7 @@ class ProjectTasks extends BaseProjectTasks {
 	 * @param DateTimeValue $date_end	in user gmt 
 	 * @return array
 	 */
-	function getRangeTasksByUser(DateTimeValue $date_start, DateTimeValue $date_end, $assignedUser, $task_filter = null, $archived = false, $raw_data = false) {
+	static function getRangeTasksByUser(DateTimeValue $date_start, DateTimeValue $date_end, $assignedUser, $task_filter = null, $archived = false, $raw_data = false) {
 		
 		$from_date = new DateTimeValue ( $date_start->getTimestamp ());
 		$from_date = $from_date->beginningOfDay ();
@@ -141,7 +141,7 @@ class ProjectTasks extends BaseProjectTasks {
 	 * @param ProjectTask $task
 	 * @return ProjectTask
 	 */
-	function createTaskCopy(ProjectTask $task) {
+	static function createTaskCopy(ProjectTask $task) {
 		$new = new ProjectTask ();
 		$new->setMilestoneId ( $task->getMilestoneId () );
 		$new->setParentId ( $task->getParentId () );
@@ -162,7 +162,7 @@ class ProjectTasks extends BaseProjectTasks {
 	 * @param ProjectTask $taskFrom
 	 * @param ProjectTask $taskTo
 	 */
-	function copySubTasks(ProjectTask $taskFrom, ProjectTask $taskTo, $as_template = false) {
+	static function copySubTasks(ProjectTask $taskFrom, ProjectTask $taskTo, $as_template = false) {
 		foreach ( $taskFrom->getSubTasks () as $sub ) {
 			if ($sub->getId() == $taskTo->getId()) continue;
 			$new = ProjectTasks::createTaskCopy ( $sub );
@@ -388,11 +388,11 @@ class ProjectTasks extends BaseProjectTasks {
 		return array();
 	}
 
-	function findByRelated($task_id) {
+	static function findByRelated($task_id) {
 		return ProjectTasks::instance()->findAll(array('conditions' => array('`original_task_id` = ?', $task_id)));
 	}
 
-	function findByTaskAndRelated($task_id,$original_task_id) {
+	static function findByTaskAndRelated($task_id,$original_task_id) {
 		return ProjectTasks::instance()->findAll(array('conditions' => array('(`original_task_id` = ? OR `object_id` = ?) AND `object_id` <> ?', $original_task_id,$original_task_id,$task_id)));
 	}
 	
@@ -501,5 +501,5 @@ class ProjectTasks extends BaseProjectTasks {
 		
 		return $result;
 	}
-	
+
 } // ProjectTasks
