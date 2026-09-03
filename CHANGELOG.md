@@ -7,6 +7,42 @@ Najnowsze zmiany na górze.
 
 ## [Nieopublikowane]
 
+## 2026-09-03 (część 10): sekcja Użytkownicy (Administracja) i Konto — kolejna runda
+
+Zgłoszenie po części 9: dodawanie użytkownika, aktualizacja profilu, uprawnienia,
+aktywuj/wyłącz, zmiana awatara/hasła — nadal nie działały. Część 9 pokryła tylko akcje
+wywoływane z linkiem `?ajax=true` bez dodatkowych parametrów (`id` itp.) — akcje operujące na
+KONKRETNYM użytkowniku (nie na sobie) mają inne ścieżki kodu w widokach (formularz edycji,
+lista adresów/telefonów/e-maili kontaktu), które nie były jeszcze przetestowane. Testowane tym
+razem z realnym `id` innego użytkownika (nie tylko zalogowanego), każda akcja w osobnym procesie.
+
+### Naprawione — kolejne przypadki "non-static method called statically"
+- `ContactEmails` (4 metody: `getContactMainEmail`, `getContactEmails`, `clearByContact`,
+  `getContactMainEmails`), `ContactTelephones::clearByContact`, `ContactAddresses` (4 metody:
+  `getContactMainAddressType`, `getByContact`, `clearByContact`, `getAddressByTypeId`) —
+  blokowało `ContactController::edit()` (edycja/aktualizacja profilu użytkownika przez admina)
+  i pośrednio kartę kontaktu.
+- `ContactImValues` (3 metody: `getContactMainImType`, `getByContact`, `clearByContact`) —
+  blokowało `AccountController::disable()` (Wyłącz użytkownika).
+- `SystemPermissions` (4 metody: `roleHasSystemPermission`, `getRolePermissions`,
+  `getNotRolePermissions`, `getAllRolesPermissions`) — blokowało `ContactController::add_user()`
+  (Dodawanie użytkownika).
+- `CountryCodes` (3 metody: `getAll`, `getCountryNameByCode`, `getCountryCodeByName`) — klasa
+  spoza wzorca DataManager (statyczna tablica krajów, nie tabela DB), ale ten sam problem —
+  blokowało formularz edycji profilu (pole "kraj" w adresie, `application/helpers/form.php`).
+- `Contacts::getObjectTypeId()` wołane statycznie w dwóch widokach
+  (`account/edit_profile.php`, `contact/add_user.php`) → `Contacts::instance()->getObjectTypeId()`.
+
+### Naprawione — przy okazji (martwy kod, nie blokował niczego)
+- `ContactAddresses::getContactMainAddressType()` — `ContactAddresss::instance()` (literówka w
+  nazwie klasy, brakująca litera) → `self::instance()`. Metoda nie ma żadnych wywołań w kodzie
+  (martwy kod), więc błąd nigdy się nie ujawniał, ale naprawiony przy okazji tego samego pliku.
+
+Zweryfikowane: `contact/add_user`, `contact/edit`, `contact/card`, `account/edit_profile`,
+`account/edit_avatar`, `account/edit_password`, `account/update_permissions`,
+`account/disable`, `account/restore_user` — wszystkie z `id` wskazującym na innego użytkownika
+(nie tylko siebie), każda w osobnym procesie PHP, bez `Throwable`.
+
 ## 2026-09-03 (część 9): Administracja i Konto naprawione naprawdę
 
 Poprzednia naprawa (część 7) testowała akcje kontrolerów bezpośrednim wywołaniem metod, co

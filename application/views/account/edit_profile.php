@@ -22,7 +22,7 @@
 	
 
 		<?php $categories = array(); Hook::fire('object_edit_categories', $object, $categories); ?>
-		<?php $cps = CustomProperties::countHiddenCustomPropertiesByObjectType(Contacts::getObjectTypeId()); ?>
+		<?php $cps = CustomProperties::countHiddenCustomPropertiesByObjectType(Contacts::instance()->getObjectTypeId()); ?>
 	
 		<div style="padding-top:5px">
 		<?php if (can_manage_billing(logged_user()) && isset($billing_categories) && count($billing_categories) > 0) {?>

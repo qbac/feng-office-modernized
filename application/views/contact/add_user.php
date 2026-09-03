@@ -67,7 +67,7 @@
   </div>
   
 	  <?php $categories = array(); Hook::fire('object_add_categories', $object, $categories); ?>
-	  <?php $cps = CustomProperties::countHiddenCustomPropertiesByObjectType(Contacts::getObjectTypeId()); ?>
+	  <?php $cps = CustomProperties::countHiddenCustomPropertiesByObjectType(Contacts::instance()->getObjectTypeId()); ?>
 	  	
 	  <div style="padding-top:5px">
 		<a href="#" class="option" onclick="og.toggleAndBolden('<?php echo $genid ?>add_user_advanced', this)"><?php echo lang('advanced') ?></a> - 
